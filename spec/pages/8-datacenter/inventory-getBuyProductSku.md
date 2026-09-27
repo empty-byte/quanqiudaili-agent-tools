@@ -55,53 +55,29 @@ paths:
                   time:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      countrys:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              title: 国家id。即：country_id
-                            name:
-                              type: string
-                              title: 国家名称
-                            image:
-                              type: string
-                            code:
-                              type: string
-                              title: 国家编码
-                            type_text:
-                              type: string
-                            status_text:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                          x-apifox-orders:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                        title: 国家列表
-                    required:
-                      - countrys
-                    x-apifox-orders:
-                      - countrys
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        country_id:
+                          type: integer
+                        city_id:
+                          type: integer
+                        country_name:
+                          type: string
+                        country_code:
+                          type: string
+                        city_name:
+                          type: string
+                        city_code:
+                          type: string
+                        use_random_city:
+                          type: integer
+                        remark:
+                          type: string
+                        sku_status:
+                          type: integer
                 required:
-                  - code
-                  - msg
-                  - time
-                  - data
-                x-apifox-orders:
                   - code
                   - msg
                   - time
@@ -112,14 +88,15 @@ paths:
                   value:
                     code: 1
                     msg: ok
-                    time: '1750131384'
+                    time: '1790492962'
                     data:
                       - country_id: 1905
-                        city_id: 1697480
+                        city_id: 0
                         country_name: 美国
                         country_code: US
-                        city_name: New York City
-                        use_random_city: 0
+                        city_name: ''
+                        city_code: ''
+                        use_random_city: 1
                         remark: 紧缺
                         sku_status: 1
                 '2':

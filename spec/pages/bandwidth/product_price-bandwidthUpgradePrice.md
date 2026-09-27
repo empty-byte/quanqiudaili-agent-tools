@@ -19,8 +19,8 @@ paths:
       parameters:
         - name: sub_accounts[]
           in: query
-          description: 子账号
-          required: false
+          description: 子账号id。数组传递
+          required: true
           example:
             - '33'
             - '32'
@@ -30,18 +30,18 @@ paths:
               type: string
         - name: bandwidth_num
           in: query
-          description: 要升级的带宽值
-          required: false
-          example: '20'
+          description: 要升级的带宽值，升级的带宽值要大于现在的带宽值
+          required: true
+          example: 20
           schema:
-            type: string
+            type: integer
         - name: product_type_id
           in: query
-          description: 产品类型
-          required: false
-          example: '3'
+          description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: token
           in: header
           description: ''
@@ -73,64 +73,66 @@ paths:
                           properties:
                             sub_account:
                               type: integer
-                              title: 子账号
+                            original_bandwidth_num:
+                              type: integer
                             bandwidth_num:
                               type: string
-                              title: 要升级的带宽值
                             username:
                               type: string
-                              title: 子账号账户名
+                            current_set_meal_name:
+                              type: string
                             upgrade_set_meal_name:
                               type: string
-                              title: 要升级的带宽套餐
                             days:
                               type: integer
-                              title: 天数
                             money:
                               type: string
-                              title: 金额
                             bandwidth_price_settings_id:
                               type: integer
                             set_meal_bandwidth_id:
                               type: integer
-                            last_time_ids:
-                              type: array
-                              items:
-                                type: integer
-                          x-apifox-orders:
+                          required:
                             - sub_account
+                            - original_bandwidth_num
                             - bandwidth_num
                             - username
+                            - current_set_meal_name
                             - upgrade_set_meal_name
                             - days
                             - money
                             - bandwidth_price_settings_id
                             - set_meal_bandwidth_id
-                            - last_time_ids
+                          x-apifox-orders:
+                            - sub_account
+                            - original_bandwidth_num
+                            - bandwidth_num
+                            - username
+                            - current_set_meal_name
+                            - upgrade_set_meal_name
+                            - days
+                            - money
+                            - bandwidth_price_settings_id
+                            - set_meal_bandwidth_id
                       days:
                         type: integer
-                        title: 总天数
-                      realPrice:
+                      total_money:
                         type: string
-                        title: 总金额
-                      useCustomPriceLimit:
+                      use_custom_price_limit:
+                        type: string
+                      total_num:
                         type: integer
-                        title: 使用自定义价格中的额度
-                      totalNum:
-                        type: integer
-                        title: 总数量
                     required:
                       - list
                       - days
-                      - realPrice
-                      - useCustomPriceLimit
-                      - totalNum
+                      - total_money
+                      - use_custom_price_limit
+                      - total_num
                     x-apifox-orders:
                       - list
                       - days
-                      - realPrice
-                      - useCustomPriceLimit
-                      - totalNum
+                      - total_money
+                      - use_custom_price_limit
+                      - total_num
                 required:
                   - code
                   - msg

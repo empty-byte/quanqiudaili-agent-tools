@@ -93,10 +93,6 @@ paths:
                       channel:
                         type: string
                         description: 推广方式：0=用户推广，1=渠道推广
-                      origin_money:
-                        type: string
-                      give_money:
-                        type: string
                       token:
                         type: string
                         description: 登录token
@@ -119,8 +115,6 @@ paths:
                       - owner_verify_status
                       - ref
                       - channel
-                      - origin_money
-                      - give_money
                       - token
                     x-apifox-orders:
                       - id
@@ -141,8 +135,6 @@ paths:
                       - owner_verify_status
                       - ref
                       - channel
-                      - origin_money
-                      - give_money
                       - token
                 x-apifox-orders:
                   - code
@@ -154,6 +146,36 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功
+                time: '1697528176'
+                data:
+                  id: 1
+                  username: userxxxx
+                  nickname: demo_name
+                  email: demo_name@qq.com
+                  mobile: ''
+                  email_verify: 1
+                  mobile_verify: 0
+                  avatar: >-
+                    data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgaGVpZ2h0PSIxMDAiIHdpZHRoPSIxMDAiPjxyZWN0IGZpbGw9InJnYigxNjEsMTYwLDIyOSkiIHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48L3JlY3Q+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LXNpemU9IjUwIiB0ZXh0LWNvcHk9ImZhc3QiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHRleHQtcmlnaHRzPSJhZG1pbiIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjc8L3RleHQ+PC9zdmc+
+                  duties: null
+                  gender: 0
+                  purpose: null
+                  money: '3347.42'
+                  score: 2195
+                  extension_status: 2
+                  verify_status: '1'
+                  owner_verify_status: '0'
+                  ref: ''
+                  channel: '1'
+                  token: 3646c38e-82fd-4dc8-8815-b662229b83ac
+                  user_id: 1
+                  createtime: 1697512606
+                  expiretime: 1700104606
+                  expires_in: 2576430
+                  ref_status: 渠道推广
           headers: {}
           x-apifox-name: 成功
       security: []

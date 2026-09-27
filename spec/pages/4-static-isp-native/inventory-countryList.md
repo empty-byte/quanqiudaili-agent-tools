@@ -48,53 +48,17 @@ paths:
                   time:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      countrys:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              title: 国家id。即：country_id
-                            name:
-                              type: string
-                              title: 国家名称
-                            image:
-                              type: string
-                            code:
-                              type: string
-                              title: 国家编码
-                            type_text:
-                              type: string
-                            status_text:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                          x-apifox-orders:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                        title: 国家列表
-                    required:
-                      - countrys
-                    x-apifox-orders:
-                      - countrys
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        code:
+                          type: string
                 required:
-                  - code
-                  - msg
-                  - time
-                  - data
-                x-apifox-orders:
                   - code
                   - msg
                   - time
@@ -102,21 +66,11 @@ paths:
               example:
                 code: 1
                 msg: 获取成功!
-                time: '1697680105'
+                time: '1790492892'
                 data:
-                  countrys:
-                    - id: 11
-                      name: 美国
-                      image: ''
-                      code: US
-                      type_text: ''
-                      status_text: ''
-                    - id: 12
-                      name: 中国台湾省
-                      image: ''
-                      code: TW
-                      type_text: ''
-                      status_text: ''
+                  - id: 1174
+                    name: 美国
+                    code: US
           headers: {}
           x-apifox-name: 成功
       security: []

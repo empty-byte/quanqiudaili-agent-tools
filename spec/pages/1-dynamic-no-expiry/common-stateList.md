@@ -1,4 +1,4 @@
-# 获取动态住宅对应洲列表
+# 获取动态住宅对应州、省列表
 
 ## OpenAPI Specification
 
@@ -11,9 +11,9 @@ info:
 paths:
   /externalapi/common/stateList:
     get:
-      summary: 获取动态住宅对应洲列表
+      summary: 获取动态住宅对应州、省列表
       deprecated: false
-      description: 获取动态住宅（不限时长）对应洲列表
+      description: 获取动态住宅（不限时长）对应州、省列表
       tags:
         - 用户IP子账号管理/动态住宅流量子账号（不限时长）
       parameters:
@@ -84,6 +84,23 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1752746667'
+                data:
+                  - name: Wales
+                    code: Wales
+                    country_name: 英国
+                  - name: Scotland
+                    code: Scotland
+                    country_name: 英国
+                  - name: Northern Ireland
+                    code: Northern Ireland
+                    country_name: 英国
+                  - name: England
+                    code: England
+                    country_name: 英国
           headers: {}
           x-apifox-name: 成功
       security: []

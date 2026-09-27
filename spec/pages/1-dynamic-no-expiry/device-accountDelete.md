@@ -13,7 +13,7 @@ paths:
     delete:
       summary: 删除单个动态住宅子账号
       deprecated: false
-      description: 批量删除动态住宅（不限时长）子账号信息
+      description: 删除单个动态住宅（不限时长）子账号信息
       tags:
         - 用户IP子账号管理/动态住宅流量子账号（不限时长）
       parameters:
@@ -35,9 +35,9 @@ paths:
                   example: 1
                   type: integer
                 id:
+                  type: integer
                   description: 子账号id
-                  example: '22'
-                  type: string
+                  example: 22
               required:
                 - product_type_id
                 - id

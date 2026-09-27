@@ -19,15 +19,15 @@ paths:
       parameters:
         - name: product_type_id
           in: query
-          description: 产品类型
-          required: false
-          example: '3'
+          description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: subAccounts[]
           in: query
           description: 子账号id
-          required: false
+          required: true
           example:
             - '33'
             - '32'
@@ -109,23 +109,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 获取成功!
-                time: '1755253333'
-                data:
-                  list:
-                    - downstreamTraffic: 0
-                      exitPortIP: 96.62.135.150
-                      subAccount: '69607'
-                      upstreamTraffic: 0
-                      bindUser: zhizhuipsrt-69607
-                    - downstreamTraffic: 0
-                      exitPortIP: 89.42.40.173
-                      subAccount: '69606'
-                      upstreamTraffic: 0
-                      bindUser: zhizhuipsrt-69606
-                  total: 2
           headers: {}
           x-apifox-name: 成功
       security: []

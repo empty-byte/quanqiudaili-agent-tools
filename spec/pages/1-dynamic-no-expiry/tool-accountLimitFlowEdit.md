@@ -31,17 +31,19 @@ paths:
               type: object
               properties:
                 product_type_id:
+                  type: integer
                   description: 产品类型id，此处固定类别为：1
-                  example: '1'
-                  type: string
+                  example: 1
                 id:
+                  type: integer
                   description: 子账号id
-                  example: '58'
-                  type: string
+                  example: 58
                 limit_flow:
-                  description: 流量上限，GB，0 到 1000000；0 = 取消限制并删除限流记录
-                  example: '1'
-                  type: string
+                  type: integer
+                  description: >-
+                    流量上限，GB，0 到 1000000；0 =
+                    取消限制并删除限流记录。新上限低于已用量时，该子账号会立即停用，并断开正在使用的连接
+                  example: 1
                 type:
                   description: 限流类型：0 = 永久，按子账号累计用量，默认；1 = 周期
                   example: ''

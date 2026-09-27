@@ -19,18 +19,18 @@ paths:
       parameters:
         - name: product_type_id
           in: query
-          description: 产品类型
-          required: false
-          example: '3'
+          description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: subAccount
           in: query
           description: 子账号id
-          required: false
-          example: '3'
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: token
           in: header
           description: ''
@@ -92,6 +92,18 @@ paths:
                             update_time_text:
                               type: string
                               title: 更新时间
+                          required:
+                            - id
+                            - max_bandwidth
+                            - min_bandwidth
+                            - start_time
+                            - end_time
+                            - start_time_text
+                            - end_time_text
+                            - create_time
+                            - update_time
+                            - create_time_text
+                            - update_time_text
                           x-apifox-orders:
                             - id
                             - max_bandwidth
@@ -104,28 +116,28 @@ paths:
                             - update_time
                             - create_time_text
                             - update_time_text
-                        title: 在有效期内的详情情况
+                        description: 在有效期内的详情情况
                       end_time:
                         type: integer
-                        title: 子账号的结束时间
+                        description: 子账号的结束时间
                       end_time_text:
                         type: string
-                        title: 子账号的结束时间
+                        description: 子账号的结束时间
                       current_max_bandwidth:
                         type: integer
-                        title: 当前峰值带宽
+                        description: 当前峰值带宽
                       current_min_bandwidth:
                         type: integer
-                        title: 当前保底带宽
+                        description: 当前保底带宽
                       current_cycle_end_time:
                         type: integer
-                        title: 当前带宽结束时间节点
+                        description: 当前带宽结束时间节点
                       current_cycle_end_time_text:
                         type: string
-                        title: 当前带宽结束时间节点
+                        description: 当前带宽结束时间节点
                       cycle_min_bandwidth_maximum:
                         type: integer
-                        title: 子账号结束周期内保底带宽的最大值
+                        description: 子账号结束周期内保底带宽的最大值
                     required:
                       - list
                       - end_time
@@ -160,26 +172,37 @@ paths:
                   value:
                     code: 1
                     msg: 获取成功!
-                    time: '1759047899'
+                    time: '1790490757'
                     data:
                       list:
-                        - id: 101
+                        - id: 330879
                           max_bandwidth: 100
                           min_bandwidth: 5
-                          start_time: 1758345185
-                          end_time: 1759554782
-                          start_time_text: '2025-09-20 13:13:05'
-                          end_time_text: '2025-10-04 13:13:02'
-                          create_time: 1758345232
-                          update_time: 1758345232
-                          create_time_text: '2025-09-20 13:13:52'
-                          update_time_text: '2025-09-20 13:13:52'
-                      end_time: 1759554782
-                      end_time_text: '2025-10-04 13:13:02'
+                          start_time: 1790487449
+                          end_time: 1791092248
+                          start_time_text: '2026-09-27 13:37:29'
+                          end_time_text: '2026-10-04 13:37:28'
+                          create_time: 1790487449
+                          update_time: 1790487449
+                          create_time_text: '2026-09-27 13:37:29'
+                          update_time_text: '2026-09-27 13:37:29'
+                        - id: 330880
+                          max_bandwidth: 100
+                          min_bandwidth: 5
+                          start_time: 1791092248
+                          end_time: 1791697048
+                          start_time_text: '2026-10-04 13:37:28'
+                          end_time_text: '2026-10-11 13:37:28'
+                          create_time: 1790490027
+                          update_time: 1790490027
+                          create_time_text: '2026-09-27 14:20:27'
+                          update_time_text: '2026-09-27 14:20:27'
+                      end_time: 1791697048
+                      end_time_text: '2026-10-11 13:37:28'
                       current_max_bandwidth: 100
                       current_min_bandwidth: 5
-                      current_cycle_end_time: 1759554782
-                      current_cycle_end_time_text: '2025-10-04 13:13:02'
+                      current_cycle_end_time: 1791092248
+                      current_cycle_end_time_text: '2026-10-04 13:37:28'
                       cycle_min_bandwidth_maximum: 5
                 '2':
                   summary: 成功示例

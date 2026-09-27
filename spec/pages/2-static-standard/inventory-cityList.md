@@ -28,7 +28,7 @@ paths:
           in: query
           description: >-
             国家id。可从<a href='/api-222487309'
-            target='_blank'>静态住宅（普通非原生）国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>静态住宅（普通非原生）国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: '1905'
           schema:
@@ -37,7 +37,7 @@ paths:
           in: query
           description: >-
             国家code。可从<a href='/api-222487309'
-            target='_blank'>静态住宅（普通非原生）国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>静态住宅（普通非原生）国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: US
           schema:
@@ -68,8 +68,34 @@ paths:
                   data:
                     type: array
                     items:
-                      type: string
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                          description: 城市名称
+                        code:
+                          type: string
+                          description: 城市编码
+                        country_id:
+                          type: integer
+                          description: 国家id
+                        country_code:
+                          type: string
+                          description: 国家编码
+                      x-apifox-orders:
+                        - id
+                        - name
+                        - code
+                        - country_id
+                        - country_code
                 required:
+                  - code
+                  - msg
+                  - time
+                  - data
+                x-apifox-orders:
                   - code
                   - msg
                   - time
@@ -77,21 +103,13 @@ paths:
               example:
                 code: 1
                 msg: 获取成功!
-                time: '1697680105'
+                time: '1790487138'
                 data:
-                  countrys:
-                    - id: 11
-                      name: 美国
-                      image: ''
-                      code: US
-                      type_text: ''
-                      status_text: ''
-                    - id: 12
-                      name: 中国台湾省
-                      image: ''
-                      code: TW
-                      type_text: ''
-                      status_text: ''
+                  - id: 3891
+                    name: Hong Kong
+                    code: Hong Kong
+                    country_id: 582
+                    country_code: HK
           headers: {}
           x-apifox-name: 成功
       security: []

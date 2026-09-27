@@ -85,7 +85,6 @@ paths:
               required:
                 - product_type_id
                 - num
-                - timelen
                 - country
             examples: {}
       responses:

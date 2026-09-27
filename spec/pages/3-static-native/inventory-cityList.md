@@ -28,7 +28,7 @@ paths:
           in: query
           description: >-
             国家id。可从<a href='/api-245746641'
-            target='_blank'>静态住宅（原生）国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>静态住宅（原生）国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: '653'
           schema:
@@ -37,7 +37,7 @@ paths:
           in: query
           description: >-
             国家code。可从<a href='/api-245746641'
-            target='_blank'>静态住宅（原生）国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>静态住宅（原生）国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: US
           schema:

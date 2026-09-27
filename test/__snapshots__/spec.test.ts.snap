@@ -19,12 +19,13 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "subAccount": {
-          "description": "子账号id",
+          "description": "子账号 id，取 sub_account_list 返回的 id 字段",
           "type": "string",
         },
       },
       "required": [
         "product_type_id",
+        "subAccount",
       ],
       "type": "object",
     },
@@ -61,6 +62,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       },
       "required": [
         "product_type_id",
+        "subAccounts",
       ],
       "type": "object",
     },
@@ -128,7 +130,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "subAccount": {
-          "description": "子账号id",
+          "description": "子账号 id，取 sub_account_list 返回的 id 字段",
           "type": "string",
         },
         "trend_type": {
@@ -142,6 +144,8 @@ exports[`spec/tools.json > 完整快照 1`] = `
       },
       "required": [
         "product_type_id",
+        "subAccount",
+        "trend_type",
       ],
       "type": "object",
     },
@@ -158,7 +162,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "additionalProperties": false,
       "properties": {
         "bandwidth_num": {
-          "description": "要升级的带宽值",
+          "description": "要升级的带宽值，升级的带宽值要大于现在的带宽值",
           "type": "integer",
         },
         "product_type_id": {
@@ -174,7 +178,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
         "sub_accounts": {
           "description": "要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段",
           "items": {
-            "description": "子账号",
+            "description": "子账号id。数组传递",
             "type": "string",
           },
           "type": "array",
@@ -289,7 +293,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "additionalProperties": false,
       "properties": {
         "bandwidth_num": {
-          "description": "要升级的带宽",
+          "description": "要升级的带宽值，升级的带宽值要大于现在的带宽值",
           "type": "integer",
         },
         "product_type_id": {
@@ -303,18 +307,18 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "subAccountIds": {
-          "description": "要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段，与 bandwidth_upgrade_price 试算时传的一致",
+          "description": "要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段；和 bandwidth_upgrade_price 试算时是同一批子账号，只是那边的参数名叫 sub_accounts",
           "items": {
-            "description": "子账号",
+            "description": "子账号id。数组传递",
             "type": "string",
           },
           "type": "array",
         },
       },
       "required": [
+        "product_type_id",
         "subAccountIds",
         "bandwidth_num",
-        "product_type_id",
       ],
       "type": "object",
     },
@@ -325,7 +329,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "带宽升级下单",
   },
   {
-    "description": "会从账户余额扣费。购买动态住宅流量：产品 1 按 GB 购买，num 为 GB 数（1-1024）；产品 6 为包月，bill_timelen 指定月数。下单前先用 product_unit_price 查价、user_info 查余额，并向用户确认。",
+    "description": "会从账户余额扣费。购买动态住宅流量，num 为 GB 数（1-300，要买更多请分几次下单）：产品 1 不限时长；产品 6 为包月，num 是每月的 GB 数，bill_timelen 指定有效时长档位。下单前先用 product_unit_price 查价、user_info 查余额，并向用户确认。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
@@ -340,7 +344,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "num": {
-          "description": "需要购买的流量数量。单位：GB。范围：1-1024GB之间",
+          "description": "需要购买的流量数量。单位：GB。范围：1-300GB之间。如果要购买更多，请多次请求",
           "type": "integer",
         },
         "product_type_id": {
@@ -397,7 +401,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "num": {
-          "description": "测试 IP 数量，1 到 10",
+          "description": "需要短期购买的子账号数量。范围：1-10之间",
           "type": "integer",
         },
         "product_type_id": {
@@ -411,7 +415,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "timelen": {
-          "description": "测试时长，固定12小时",
+          "description": "测试时长，单位小时；普通账号固定传 12",
           "type": "integer",
         },
       },
@@ -431,7 +435,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "购买时长测试 IP",
   },
   {
-    "description": "会从账户余额扣费。购买静态住宅（2/3/4）或数据中心（8）时长 IP，num 为 IP 数量（1-300）。下单前先用 stock_check 检测库存、product_unit_price 查价，并向用户确认。",
+    "description": "会从账户余额扣费。购买静态住宅（2/3/4）或数据中心（8）时长 IP，num 为 IP 数量（1-300，数据中心单次最多 50）；数据中心不卖 7 天。下单前先用 stock_check 检测库存、product_unit_price 查价，并向用户确认。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
@@ -480,7 +484,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "num": {
-          "description": "需要购买的子账号数量。范围：1-300之间",
+          "description": "需要购买的 IP 数量，1-300；数据中心（8）单次最多 50",
           "type": "integer",
         },
         "product_type_id": {
@@ -506,7 +510,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "timelen": {
-          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天",
+          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不卖 7 天，不能选 0",
           "enum": [
             0,
             1,
@@ -577,7 +581,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "申请退单",
   },
   {
-    "description": "会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。不会改动子账号的自动续费开关；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。",
+    "description": "会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。数据中心不能续 7 天。不会改动子账号的自动续费开关；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
@@ -605,7 +609,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "timelen": {
-          "description": "续费时长：0=7天，1=30天，2=90天，3=180天，4=360天",
+          "description": "续费时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不能续 7 天，不能选 0",
           "enum": [
             0,
             1,
@@ -630,7 +634,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "续费时长 IP",
   },
   {
-    "description": "查询平台产品信息列表。",
+    "description": "查询平台启用的产品列表，返回产品 id、名称和账号后缀。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -809,7 +813,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "时长产品地区库存",
   },
   {
-    "description": "购买时长 IP 前检测库存是否满足，不下单、不扣费。参数与 order_buy_time_ip 一致。",
+    "description": "购买时长 IP 前检测库存是否满足，不下单、不扣费。参数与 order_buy_time_ip 基本相同，但没有 agree（协议不影响库存）。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -875,7 +879,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "timelen": {
-          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天",
+          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不卖 7 天，不能选 0",
           "enum": [
             0,
             1,
@@ -897,7 +901,6 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "required": [
         "product_type_id",
         "num",
-        "timelen",
         "country",
       ],
       "type": "object",
@@ -936,7 +939,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "num": {
-          "description": "需要生成的子账号数量",
+          "description": "需要生成的子账号数量。范围 1-300",
           "type": "integer",
         },
         "product_type_id": {
@@ -1146,7 +1149,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "searchArr": {
-          "description": "批量搜索的值列表，内容由 search_type 决定：自定义用户名、出口 IP 或备注关键词，一次最多 100 个",
+          "description": "批量搜索的值列表，内容由 search_type 决定：自定义用户名、出口 IP 或备注关键词，一次最多 100 个。批量搜索只对时长类产品（2/3/4/8）有效；动态产品（1/6）只能按自定义用户名搜 1 个",
           "items": {
             "description": "单个搜索值",
             "type": "string",
@@ -1247,7 +1250,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "自定义子账号账密",
   },
   {
-    "description": "为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。",
+    "description": "为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。新上限低于已用量时，该子账号会立即停用并断开正在使用的连接。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1257,7 +1260,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "limit_flow": {
-          "description": "流量上限，单位 GB，0 到 1000000；0 = 取消限制并删除限流记录",
+          "description": "流量上限，GB，0 到 1000000；0 = 取消限制并删除限流记录。新上限低于已用量时，该子账号会立即停用，并断开正在使用的连接",
           "type": "integer",
         },
         "product_type_id": {
@@ -1302,7 +1305,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "设置子账号流量上限",
   },
   {
-    "description": "批量开启或关闭时长类子账号的 IP 端口直连，ids 为逗号分隔的子账号 id。",
+    "description": "批量开启或关闭静态住宅（2/3/4）子账号的 IP 端口直连，ids 为逗号分隔的子账号 id。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1413,7 +1416,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "批量修改子账号备注",
   },
   {
-    "description": "查询当前账号余额，data 直接是金额字符串，单位元。充值余额与赠送余额的拆分看 user_info。",
+    "description": "查询当前账号余额，data 直接是金额字符串，单位元。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,

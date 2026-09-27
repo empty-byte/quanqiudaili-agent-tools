@@ -57,47 +57,32 @@ paths:
                   time:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      countrys:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              title: 国家id。即：country_id
-                            name:
-                              type: string
-                              title: 国家名称
-                            image:
-                              type: string
-                            code:
-                              type: string
-                              title: 国家编码
-                            type_text:
-                              type: string
-                            status_text:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                          x-apifox-orders:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                        title: 国家列表
-                    required:
-                      - countrys
-                    x-apifox-orders:
-                      - countrys
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: 城市名称
+                        code:
+                          type: string
+                          description: 城市编码
+                        state_name:
+                          type: string
+                          description: 州、省名称
+                        country_name:
+                          type: string
+                          description: 国家名称
+                      required:
+                        - name
+                        - code
+                        - state_name
+                        - country_name
+                      x-apifox-orders:
+                        - name
+                        - code
+                        - state_name
+                        - country_name
                 required:
                   - code
                   - msg
@@ -111,21 +96,12 @@ paths:
               example:
                 code: 1
                 msg: 获取成功!
-                time: '1697680105'
+                time: '1790487682'
                 data:
-                  countrys:
-                    - id: 11
-                      name: 美国
-                      image: ''
-                      code: US
-                      type_text: ''
-                      status_text: ''
-                    - id: 12
-                      name: 中国台湾省
-                      image: ''
-                      code: TW
-                      type_text: ''
-                      status_text: ''
+                  - name: Cammack Village
+                    code: Cammack Village
+                    state_name: Arkansas
+                    country_name: 美国
           headers: {}
           x-apifox-name: 成功
       security: []

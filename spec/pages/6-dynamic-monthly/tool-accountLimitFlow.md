@@ -20,17 +20,17 @@ paths:
         - name: product_type_id
           in: query
           description: 产品类型id，此处固定类别为：6
-          required: false
-          example: '6'
+          required: true
+          example: 6
           schema:
-            type: string
+            type: integer
         - name: id
           in: query
-          description: ''
-          required: false
-          example: '44'
+          description: 子账号id，取子账号列表返回的 id
+          required: true
+          example: 44
           schema:
-            type: string
+            type: integer
         - name: token
           in: header
           description: ''

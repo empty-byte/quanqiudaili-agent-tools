@@ -31,9 +31,9 @@ paths:
               type: object
               properties:
                 product_type_id:
+                  type: integer
                   description: 产品类型id，此处固定类别为：8
-                  example: '8'
-                  type: string
+                  example: 8
                 content[0][id]:
                   type: string
                   description: 子账号id
@@ -59,6 +59,7 @@ paths:
                   example: passwordxxx2
                   type: string
               required:
+                - product_type_id
                 - content[0][id]
                 - content[0][customUsername]
                 - content[0][customPassword]
@@ -75,7 +76,7 @@ paths:
           x-apifox-name: 成功
       security: []
       x-apifox-folder: 用户IP子账号管理/数据中心时长子账号
-      x-apifox-status: developing
+      x-apifox-status: released
       x-run-in-apifox: https://app.apifox.com/web/project/5275065/apis/api-222652617-run
 components:
   schemas: {}

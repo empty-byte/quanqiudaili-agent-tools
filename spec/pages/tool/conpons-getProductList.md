@@ -41,44 +41,57 @@ paths:
                   time:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      total:
-                        type: integer
-                        description: 总数
-                      rows:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              description: id
-                            infor:
-                              type: string
-                              description: 白名单ip
-                          required:
-                            - id
-                            - infor
-                          x-apifox-orders:
-                            - id
-                            - infor
-                    required:
-                      - total
-                      - rows
-                    x-apifox-orders:
-                      - total
-                      - rows
-                x-apifox-orders:
-                  - code
-                  - msg
-                  - time
-                  - data
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        suffix:
+                          type: string
+                        native_text:
+                          type: 'null'
+                      required:
+                        - id
+                        - name
+                        - suffix
+                        - native_text
                 required:
                   - code
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1790491344'
+                data:
+                  - id: 1
+                    name: 全球动态住宅 - 按流量计费(不限时长)
+                    suffix: drf
+                    native_text: null
+                  - id: 2
+                    name: 独享静态住宅（普通）
+                    suffix: srtisp
+                    native_text: null
+                  - id: 3
+                    name: 独享静态住宅（本土原生）
+                    suffix: srtisp
+                    native_text: null
+                  - id: 4
+                    name: 独享静态住宅（运营商原生）
+                    suffix: srtisp
+                    native_text: null
+                  - id: 6
+                    name: 全球动态住宅 - 按流量计费(包月)
+                    suffix: drft
+                    native_text: null
+                  - id: 8
+                    name: 独享静态数据中心
+                    suffix: sctisp
+                    native_text: null
           headers: {}
           x-apifox-name: 成功
       security: []

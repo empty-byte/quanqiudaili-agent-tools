@@ -5,7 +5,7 @@ import type { ToolDef } from './types.js';
 type Handler = (input: Record<string, unknown>, ctx: ServerContext) => Promise<CallToolResult | InputRequiredResult>;
 
 /**
- * 后端续费接口会把本次的 is_renew（文档没写，不传当 0）和 renew_with_bandwidth 写回子账号的自动续费设置，
+ * 后端续费接口会把本次的 is_renew（不传当 0）和 renew_with_bandwidth 写回子账号的自动续费设置，
  * 照文档直接调一次就会把用户开着的自动续费关掉。所以续费前先查子账号当前值：
  * is_renew 一律沿用，renew_with_bandwidth 没传才沿用；子账号之间不一致就报错让调用方分开续费。
  */

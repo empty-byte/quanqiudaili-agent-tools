@@ -39,7 +39,7 @@ paths:
                   example: 1
                   type: integer
                 timelen:
-                  description: 时长计费类型：0=7天，1=30天，2=90天，3=180天，4=360天，5=3天
+                  description: 时长计费类型：0=7天，1=30天，2=90天，3=180天，4=360天
                   example: 0
                   type: integer
                 agree:
@@ -227,60 +227,35 @@ paths:
                   summary: 成功示例
                   value:
                     code: 1
-                    msg: 获取成功
-                    time: '1697164784'
+                    msg: 购买成功
+                    time: '1790487445'
                     data:
-                      total: 1
-                      rows:
-                        - id: '1'
-                          is_diff: 0
-                          agree: SOCKS5
-                          country: US
-                          target: proxy.quanqiudaili.com
+                      sub_accounts:
+                        - password: xxxxx
+                          username: xxxx-xx
+                          id: 78
+                          is_bind: 否
+                          bindUser: xxxx-xx
+                          disabled: 0
+                          bindPassword: xxxx
+                          createTime: '2026-09-27 13:37:29'
                           port: 5001
-                          username: test
-                          password: test
-                          is_bind: '0'
-                          remark: ''
-                          poolStatus: online
-                          bindUser: test
-                          bindPassword: test
-                          ip: 172.11.11.11
-                          countdown: 7.0天
-                          expiresIn: 1747108219
-                          createtime: '2025-05-06 11:50:20'
-                          state: New York
-                          city: New York City
-                          bill: 0
+                          agree: SOCKS5
+                          bandwidth_num: '5'
+                          target: proxy.quanqiudaili.com
+                          poolStatus: ''
+                          changeInterval: 0
+                          expiresIn: 1791092248
+                          expiresDate: '2026-10-04 13:37:28'
+                          ip: 149.xx.xx.xx
+                          bill: '0.00'
+                          is_diff: 0
+                          country: US
                           countryName: 美国
-                          status: 1
-                          expireDate: '2025-05-13 11:50:19'
-                          order_back_date_valid: true
-                          order_product_buy_id: 16874
-                          order_back_status: 0
-                          is_renew: '0'
-                          order_back_reject_reason: null
-                          renewtime: '1970-01-01'
-                      baseFlow: 180.31
-                      countryList:
-                        - id: 1
-                          countryName: 全球随机
-                          country: ALL
-                        - id: 1671
-                          conutry: AX
-                          countryName: 奥兰
-                          type_text: ''
-                          status_text: ''
-                        - id: 1672
-                          conutry: AL
-                          countryName: 阿尔巴尼亚
-                          type_text: ''
-                          status_text: ''
-                        - id: 4038
-                          conutry: XK
-                          countryName: 科索沃
-                          type_text: ''
-                          status_text: ''
+                          state: Texas
+                          remark: ''
+                          city: Houston
+                      order_number: xxxxxxx
                 '2':
                   summary: 异常示例
                   value:

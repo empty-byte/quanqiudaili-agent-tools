@@ -40,7 +40,9 @@ paths:
                   example: 44
                 limit_flow:
                   type: integer
-                  description: "\t流量上限，GB，0 到 1000000；0 = 取消限制并删除限流记录"
+                  description: >-
+                    流量上限，GB，0 到 1000000；0 =
+                    取消限制并删除限流记录。新上限低于已用量时，该子账号会立即停用，并断开正在使用的连接
                   example: 2
                 type:
                   type: integer

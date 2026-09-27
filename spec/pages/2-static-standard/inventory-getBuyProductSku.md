@@ -70,21 +70,21 @@ paths:
                           type: string
                         country_code:
                           type: string
-                          title: 国家code
+                          description: 国家code
                         city_name:
                           type: string
-                          title: 城市名称
+                          description: 城市名称
                         city_code:
                           type: string
-                          title: 城市code
+                          description: 城市code
                         use_random_city:
                           type: integer
                         remark:
                           type: string
-                          title: 备注
+                          description: 备注
                         sku_status:
                           type: integer
-                          title: 库存标识:0=充足,1=紧缺
+                          description: 库存标识:0=充足,1=紧缺
                       x-apifox-orders:
                         - country_id
                         - city_id
@@ -108,13 +108,14 @@ paths:
               example:
                 code: 1
                 msg: ok
-                time: '1750044858'
+                time: '1790488883'
                 data:
                   - country_id: 1770
                     city_id: 3002835
                     country_name: 中国香港
                     country_code: HK
                     city_name: Hong Kong
+                    city_code: Hong Kong
                     use_random_city: 1
                     remark: 充足
                     sku_status: 0

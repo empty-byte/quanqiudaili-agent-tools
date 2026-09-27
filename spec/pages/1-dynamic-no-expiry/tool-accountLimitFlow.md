@@ -20,17 +20,17 @@ paths:
         - name: product_type_id
           in: query
           description: 产品类型id，此处固定类别为：1
-          required: false
-          example: '1'
+          required: true
+          example: 1
           schema:
-            type: string
+            type: integer
         - name: id
           in: query
-          description: ''
-          required: false
-          example: '44'
+          description: 子账号id，取子账号列表返回的 id
+          required: true
+          example: 44
           schema:
-            type: string
+            type: integer
         - name: token
           in: header
           description: ''
@@ -89,6 +89,14 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 子账号流量设置获取成功!
+                time: '1750038212'
+                data:
+                  product_type_id: 1
+                  id: 44
+                  limit_flow: '1.00'
           headers: {}
           x-apifox-name: 成功
       security: []

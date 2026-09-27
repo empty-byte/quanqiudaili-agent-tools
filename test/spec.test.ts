@@ -79,6 +79,10 @@ describe('spec/tools.json', () => {
     expect([...up.inputSchema.required].sort()).toEqual(['bandwidth_num', 'product_type_id', 'subAccountIds']);
   });
 
+  it('续费不暴露 is_renew：后端会把它写回自动续费开关，由 renew.ts 沿用当前值', () => {
+    expect(byName('order_renew').inputSchema.properties.is_renew).toBeUndefined();
+  });
+
   it('文档缺陷兜底生效', () => {
     const limit = byName('sub_account_set_limit_flow');
     expect(limit.inputSchema.properties.type).toMatchObject({ type: 'integer', enum: [0, 1] });
@@ -105,7 +109,7 @@ describe('spec/tools.json', () => {
 
   it('spec/pages 的目录与文件名符合 placePages 规则（sync-docs 按同一规则落盘，不要手动改名）', () => {
     const pages = loadPages();
-    expect(pages).toHaveLength(81);
+    expect(pages).toHaveLength(80);
     for (const [file, p] of placePages(pages)) expect(file, p.id).toBe(`${p.id}.md`);
   });
 

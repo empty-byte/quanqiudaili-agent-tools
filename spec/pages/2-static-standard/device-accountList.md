@@ -63,14 +63,14 @@ paths:
             type: string
         - name: subAccountStart
           in: query
-          description: 子账号区间搜索[初始]
+          description: 子账号区间搜索[初始]。区间跨度不超过 5000
           required: false
           example: 100
           schema:
             type: integer
         - name: subAccountEnd
           in: query
-          description: 子账号区间搜索[结束]
+          description: 子账号区间搜索[结束]。区间跨度不超过 5000
           required: false
           example: 200
           schema:
@@ -84,7 +84,7 @@ paths:
             type: string
         - name: search_type
           in: query
-          description: 批量搜索类型(精准匹配):0=自定义账密;1=出口ip;2=备注
+          description: 0=自定义用户名（精准）；1=出口IP（精准）；2=备注（模糊）
           required: false
           example: 1
           schema:

@@ -1,4 +1,4 @@
-# 静态住宅（普通非原生）库存检测 
+# 静态住宅（普通非原生）库存检测
 
 ## OpenAPI Specification
 
@@ -11,7 +11,7 @@ info:
 paths:
   /externalapi/product_order/checkInventory:
     post:
-      summary: '静态住宅（普通非原生）库存检测 '
+      summary: 静态住宅（普通非原生）库存检测
       deprecated: false
       description: 购买静态住宅（普通非原生）时长IP前的库存检测
       tags:
@@ -85,7 +85,6 @@ paths:
               required:
                 - product_type_id
                 - num
-                - timelen
                 - country
             examples: {}
       responses:

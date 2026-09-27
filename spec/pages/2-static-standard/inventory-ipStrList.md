@@ -10,7 +10,7 @@ info:
   version: 1.0.0
 paths:
   /externalapi/inventory/ipStrList:
-    post:
+    get:
       summary: 查询静态住宅（普通非原生）IP段列表
       deprecated: false
       description: 获取静态住宅（普通非原生）IP段列表
@@ -43,7 +43,7 @@ paths:
                   example: Los Angeles
                   type: string
                 ip_str:
-                  description: 需要查询的ip段前缀
+                  description: IP段前缀，写前 2 段，如 38.30
                   example: '38.30'
                   type: string
                 exclude_ip_str:
@@ -51,10 +51,9 @@ paths:
                   example: '38.31'
                   type: string
                 page:
+                  type: integer
                   description: 分页
-                  example:
-                    - '1'
-                  type: array
+                  example: 1
                 pagesize:
                   description: 数量
                   example: '10'

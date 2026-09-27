@@ -39,7 +39,7 @@ paths:
                   example: 1,2
                   type: string
                 remark:
-                  description: test
+                  description: 备注
                   example: test
                   type: string
               required:

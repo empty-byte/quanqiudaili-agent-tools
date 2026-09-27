@@ -13,21 +13,21 @@ paths:
     get:
       summary: 带宽套餐列表
       deprecated: false
-      description: ''
+      description: 带宽套餐列表
       tags:
         - 增值带宽
       parameters:
         - name: product_type_id
           in: query
-          description: 产品类型
-          required: false
-          example: '3'
+          description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: country
           in: query
-          description: 地区
-          required: false
+          description: 国家编码，如 US
+          required: true
           example: US
           schema:
             type: string

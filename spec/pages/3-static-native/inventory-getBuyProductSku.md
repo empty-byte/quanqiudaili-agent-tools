@@ -67,20 +67,20 @@ paths:
                           type: string
                         country_code:
                           type: string
-                          title: 国家code
+                          description: 国家code
                         city_name:
                           type: string
                         city_code:
                           type: string
-                          title: 城市code
+                          description: 城市code
                         use_random_city:
                           type: integer
                         remark:
                           type: string
-                          title: 备注
+                          description: 备注
                         sku_status:
                           type: integer
-                          title: 库存标识:0=充足,1=城市
+                          description: 库存标识:0=充足,1=紧缺
                       x-apifox-orders:
                         - country_id
                         - city_id

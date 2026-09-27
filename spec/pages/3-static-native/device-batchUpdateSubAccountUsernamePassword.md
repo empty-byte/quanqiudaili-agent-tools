@@ -10,7 +10,7 @@ info:
   version: 1.0.0
 paths:
   /externalapi/device/batchUpdateSubAccountUsernamePassword:
-    put:
+    post:
       summary: 自定义静态住宅（原生）IP子账号用户名和密码
       deprecated: false
       description: 自定义静态住宅（原生）IP子账号用户名和密码
@@ -31,9 +31,9 @@ paths:
               type: object
               properties:
                 product_type_id:
+                  type: integer
                   description: 产品类型id，此处固定类别为：3
-                  example: '3'
-                  type: string
+                  example: 3
                 content[0][id]:
                   type: string
                   description: 子账号id
@@ -59,6 +59,7 @@ paths:
                   example: passwordxxx2
                   type: string
               required:
+                - product_type_id
                 - content[0][id]
                 - content[0][customUsername]
                 - content[0][customPassword]

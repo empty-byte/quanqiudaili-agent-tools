@@ -10,45 +10,13 @@ info:
   version: 1.0.0
 paths:
   /externalapi/product_order/createBandwidthUpgradeOrder:
-    get:
+    post:
       summary: 生成带宽升级订单
       deprecated: false
       description: ''
       tags:
         - 增值带宽
       parameters:
-        - name: subAccountIds[]
-          in: query
-          description: 子账号
-          required: false
-          example:
-            - '33'
-            - '32'
-          schema:
-            type: array
-            items:
-              type: string
-        - name: bandwidth_num
-          in: query
-          description: 要升级的带宽
-          required: false
-          example: '30'
-          schema:
-            type: string
-        - name: product_type_id
-          in: query
-          description: 产品类型
-          required: false
-          example: '3'
-          schema:
-            type: string
-        - name: pay_method
-          in: query
-          description: 支付方式alipay,wechat,balance
-          required: false
-          example: balance
-          schema:
-            type: string
         - name: token
           in: header
           description: ''
@@ -56,6 +24,33 @@ paths:
           example: '{{access_token}}'
           schema:
             type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                product_type_id:
+                  type: integer
+                  description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+                  example: 3
+                pay_method:
+                  description: 对外接口固定： balance
+                  example: balance
+                  type: string
+                subAccountIds[]:
+                  description: 子账号id。数组传递
+                  example:
+                    - '33'
+                    - '32'
+                  type: array
+                bandwidth_num:
+                  description: 要升级的带宽值，升级的带宽值要大于现在的带宽值
+                  example: '30'
+                  type: string
+              required:
+                - product_type_id
+            examples: {}
       responses:
         '200':
           description: ''
@@ -80,6 +75,7 @@ paths:
                             type: integer
                           order_number:
                             type: string
+                            description: 订单编号
                           description:
                             type: string
                           pay_gateway:
@@ -89,9 +85,14 @@ paths:
                           order_category:
                             type: integer
                           origin_money:
-                            type: string
+                            type: number
+                            description: 订单原生金额
                           real_money:
-                            type: string
+                            type: number
+                            description: 订单实际支付金额
+                          real_money_bandwidth:
+                            type: number
+                            description: 订单带宽金额
                           balance:
                             type: string
                           country:
@@ -108,11 +109,14 @@ paths:
                             type: integer
                           use_custom_price_limit:
                             type: integer
+                          bandwidth_num:
+                            type: string
                           is_bandwidth_upgrade_order:
+                            type: integer
+                          order_source:
                             type: integer
                           id:
                             type: string
-                            title: 订单id
                         required:
                           - user_id
                           - order_number
@@ -122,6 +126,7 @@ paths:
                           - order_category
                           - origin_money
                           - real_money
+                          - real_money_bandwidth
                           - balance
                           - country
                           - createtime
@@ -130,7 +135,9 @@ paths:
                           - buy_num
                           - is_use_custom_unit_price
                           - use_custom_price_limit
+                          - bandwidth_num
                           - is_bandwidth_upgrade_order
+                          - order_source
                           - id
                         x-apifox-orders:
                           - user_id
@@ -141,6 +148,7 @@ paths:
                           - order_category
                           - origin_money
                           - real_money
+                          - real_money_bandwidth
                           - balance
                           - country
                           - createtime
@@ -149,9 +157,11 @@ paths:
                           - buy_num
                           - is_use_custom_unit_price
                           - use_custom_price_limit
+                          - bandwidth_num
                           - is_bandwidth_upgrade_order
+                          - order_source
                           - id
-                        title: 订单信息
+                        description: 订单信息
                     required:
                       - orderProductBuy
                     x-apifox-orders:
@@ -169,11 +179,30 @@ paths:
               example:
                 code: 1
                 msg: 带宽升级订单创建成功！
-                time: '1755159289'
+                time: '1790491154'
                 data:
-                  orderId: 772
-                  orderNumber: 20250814161450689d9afa058a4
-                  price: '2030.00'
+                  orderProductBuy:
+                    user_id: 77
+                    order_number: 2026092xxxxxxx
+                    description: 带宽升级【独享静态住宅（本土原生）】。升级地区数量：2，升级带宽：30Mbps
+                    pay_gateway: 3
+                    order_status: 1
+                    order_category: 1
+                    origin_money: 3.73
+                    real_money: 3.73
+                    real_money_bandwidth: 3.73
+                    balance: '422.64'
+                    country: US
+                    createtime: 1790491155
+                    product_type_id: 3
+                    scope_native: local
+                    buy_num: 2
+                    is_use_custom_unit_price: 0
+                    use_custom_price_limit: 0
+                    bandwidth_num: '30'
+                    is_bandwidth_upgrade_order: 1
+                    order_source: 2
+                    id: '174144'
           headers: {}
           x-apifox-name: 成功
       security: []

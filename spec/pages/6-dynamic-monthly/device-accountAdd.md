@@ -35,11 +35,11 @@ paths:
                   example: 6
                   type: integer
                 num:
-                  description: 需要生成的子账号数量
+                  description: 需要生成的子账号数量。范围 1-300
                   example: 1
                   type: integer
                 changeInterval:
-                  description: IP时长，5-120分钟可选
+                  description: 切换时长，5-120分钟可选
                   example: 5
                   type: integer
                 agree:

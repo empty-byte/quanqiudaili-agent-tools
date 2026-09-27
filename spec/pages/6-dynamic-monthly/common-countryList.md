@@ -19,9 +19,9 @@ paths:
       parameters:
         - name: product_type_id
           in: query
-          description: 产品类型id，此处固定类别为：1
+          description: 产品类型id，此处固定类别为：6
           required: true
-          example: 1
+          example: 6
           schema:
             type: integer
         - name: token
@@ -77,6 +77,17 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1752749587'
+                data:
+                  - name: 阿富汗
+                    code: AF
+                    id: 1670
+                  - name: 奥兰
+                    code: AX
+                    id: 1671
           headers: {}
           x-apifox-name: 成功
       security: []

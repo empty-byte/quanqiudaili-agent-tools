@@ -11,7 +11,7 @@ derived: # 从已有工具派生、只取响应 data 里一个字段
     from: /externalapi/user/getUserInfo
     pick: money
     title: 账户余额
-    description: 查询当前账号余额，data 直接是金额字符串，单位元。充值余额与赠送余额的拆分看 user_info。
+    description: 查询当前账号余额，data 直接是金额字符串，单位元。
 
 tools:
   # ===== 只读工具（--readonly 只暴露这些）=====
@@ -28,15 +28,13 @@ tools:
   /externalapi/conpons/getProductList:
     name: product_list
     title: 产品信息
-    description: 查询平台产品信息列表。
+    description: 查询平台启用的产品列表，返回产品 id、名称和账号后缀。
     readOnly: true
   /externalapi/common/countryList:
     name: dynamic_country_list
     title: 动态产品国家列表
     description: 查询动态住宅流量产品（product_type_id 1 或 6）可选的国家及编码。
     readOnly: true
-    params: # 文档缺陷兜底：包月那页把"此处固定类别为"也写成 1
-      product_type_id: { enum: [1, 6] }
   /externalapi/common/stateList:
     name: dynamic_state_list
     title: 动态产品州/省列表
@@ -70,14 +68,14 @@ tools:
     title: 时长产品地区库存
     description: 查询时长类产品某国家各地区的库存详情。
     readOnly: true
-    params: # 文档缺陷兜底：只有产品 2 那页把 country_code 标为必填，后端对所有产品都要求
-      country_code: { required: true, description: 国家编码，用 static_country_list 查 }
+    params:
+      country_code: { description: 国家编码，用 static_country_list 查 }
   /externalapi/inventory/ipStrList:
     name: static_ip_range_list
     title: 时长产品 IP 段列表
     description: 分页查询时长类产品可指定的 IP 段，供下单时的 appoint_ip 使用。
     readOnly: true
-    params: # 工具管理下那页没写固定产品，枚举按后端校验规则给；有一页把 page 写成 array
+    params: # 工具管理下那页没有固定产品，枚举按后端校验规则给
       product_type_id: { enum: [2, 3, 4, 8] }
       page: { type: integer }
       pagesize: { type: integer }
@@ -87,7 +85,7 @@ tools:
   /externalapi/product_order/checkInventory:
     name: stock_check
     title: 下单前库存检测
-    description: 购买时长 IP 前检测库存是否满足，不下单、不扣费。参数与 order_buy_time_ip 一致。
+    description: 购买时长 IP 前检测库存是否满足，不下单、不扣费。参数与 order_buy_time_ip 基本相同，但没有 agree（协议不影响库存）。
     readOnly: true
     params: # 文档只有 2/3/4 三页，后端同样接受 8
       product_type_id: { enum: [2, 3, 4, 8] }
@@ -97,7 +95,7 @@ tools:
       country: { description: 国家编码，用 static_country_list 查 }
       city: { description: 城市名称，取 static_city_list 返回的 name 字段；不传则随机 }
       bandwidth_num: { type: integer, description: 带宽加购，单位 Mbps，不传默认 5；可选档位和价格用 bandwidth_package_list 按产品和国家查，填返回的 num；数据中心（8）没有带宽加购，不要传 }
-      timelen: { enum: [0, 1, 2, 3, 4], description: 购买时长：0=7天，1=30天，2=90天，3=180天，4=360天 } # 文档缺陷兜底：文档多写了 5=3天，后端只放行 0-4
+      timelen: { enum: [0, 1, 2, 3, 4], description: 购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不卖 7 天，不能选 0 }
       use_ip_port: { enum: [0, 1] }
       random_account_password: { enum: [0, 1] }
   /externalapi/device/accountList:
@@ -107,7 +105,7 @@ tools:
     readOnly: true
     params:
       search_type: { enum: [0, 1, 2], description: 批量搜索类型，和 searchArr 一起用：0=按自定义用户名精确找，1=按出口 IP 精确找，2=按备注模糊找（多个关键词任一命中即可） }
-      searchArr: { description: 批量搜索的值列表，内容由 search_type 决定：自定义用户名、出口 IP 或备注关键词，一次最多 100 个 }
+      searchArr: { description: 批量搜索的值列表，内容由 search_type 决定：自定义用户名、出口 IP 或备注关键词，一次最多 100 个。批量搜索只对时长类产品（2/3/4/8）有效；动态产品（1/6）只能按自定义用户名搜 1 个 }
       "searchArr[]": { description: 单个搜索值 }
       country: { description: 按国家筛选。动态产品用 dynamic_country_list 查编码，时长类产品用 static_country_list }
       exportIp: { description: 按出口 IP 筛选，可填完整 IP 或前缀（如 104.223），按前缀匹配 }
@@ -126,8 +124,8 @@ tools:
     title: 子账号流量上限
     description: 查询动态子账号的流量上限设置与已用量。
     readOnly: true
-    params: # 文档缺陷兜底：两页都把 id 标成非必填、无描述
-      id: { type: string, required: true, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
+    params:
+      id: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
   /externalapi/bandwidth/getBandwidthList:
     name: bandwidth_package_list
     title: 带宽套餐列表
@@ -135,7 +133,7 @@ tools:
     readOnly: true
     params:
       product_type_id: { enum: [2, 3, 4, 8] }
-      country: { required: true, description: 国家编码，用 static_country_list 查 } # 文档缺陷兜底：文档标为可选，后端 require
+      country: { description: 国家编码，用 static_country_list 查 }
   /externalapi/bandwidth/monitoringList:
     name: bandwidth_monitoring_list
     title: 带宽监控列表
@@ -151,6 +149,7 @@ tools:
     readOnly: true
     params:
       product_type_id: { enum: [2, 3, 4, 8] }
+      subAccount: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
       trend_type: { type: integer, enum: [1, 2], description: 趋势类型：1=实时，固定最近 60 分钟，忽略时间参数；2=历史，按 startTime 和 endTime 取，跨度最多 2 天，不传默认最近 1 天 }
       startTime: { type: integer, description: 开始时间，Unix 秒级时间戳，只在 trend_type=2 时生效 }
       endTime: { type: integer, description: 结束时间，Unix 秒级时间戳，只在 trend_type=2 时生效 }
@@ -161,6 +160,7 @@ tools:
     readOnly: true
     params:
       product_type_id: { enum: [2, 3, 4, 8] }
+      subAccount: { type: string, required: true, description: 子账号 id，取 sub_account_list 返回的 id 字段 } # 文档缺陷兜底：文档标为非必填，后端 require
   /externalapi/product_price/bandwidthUpgradePrice:
     name: bandwidth_upgrade_price
     title: 带宽升级价格试算
@@ -193,8 +193,6 @@ tools:
     name: sub_account_update_batch
     title: 批量修改子账号备注
     description: 批量修改多个子账号的备注，ids 为逗号分隔的子账号 id。
-    params: # 文档缺陷兜底：remark 的描述写成了 "test"
-      remark: { description: 备注 }
   /externalapi/device/batchUpdateSubAccountUsernamePassword:
     name: sub_account_set_credentials
     title: 自定义子账号账密
@@ -206,16 +204,15 @@ tools:
   /externalapi/device/portEnableUpdateList:
     name: sub_account_toggle_direct
     title: 批量开关直连
-    description: 批量开启或关闭时长类子账号的 IP 端口直连，ids 为逗号分隔的子账号 id。
+    description: 批量开启或关闭静态住宅（2/3/4）子账号的 IP 端口直连，ids 为逗号分隔的子账号 id。
     params:
       use_ip_port: { enum: [0, 1] }
   /externalapi/tool/accountLimitFlowEdit:
     name: sub_account_set_limit_flow
     title: 设置子账号流量上限
-    description: 为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。
-    params: # 文档缺陷兜底：新页 limit_flow、type、timelen 全为 string，type 的描述有误
+    description: 为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。新上限低于已用量时，该子账号会立即停用并断开正在使用的连接。
+    params: # 文档没有给 type、timelen 枚举，类型也不统一
       id: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
-      limit_flow: { type: integer, description: 流量上限，单位 GB，0 到 1000000；0 = 取消限制并删除限流记录 }
       type: { type: integer, enum: [0, 1], description: 限流类型：0 = 永久，按子账号累计用量（默认）；1 = 周期 }
       timelen: { type: integer, enum: [0, 1, 2, 3, 4], description: 周期：0 天、1 周、2 月、3 季度、4 年；type=1 时必填，type=0 时忽略 }
   /externalapi/device/accountDelete:
@@ -235,16 +232,17 @@ tools:
       - name: order_buy_dynamic
         productTypeIds: [1, 6]
         title: 购买动态住宅流量
-        description: 会从账户余额扣费。购买动态住宅流量：产品 1 按 GB 购买，num 为 GB 数（1-1024）；产品 6 为包月，bill_timelen 指定月数。下单前先用 product_unit_price 查价、user_info 查余额，并向用户确认。
+        description: 会从账户余额扣费。购买动态住宅流量，num 为 GB 数（1-300，要买更多请分几次下单）：产品 1 不限时长；产品 6 为包月，num 是每月的 GB 数，bill_timelen 指定有效时长档位。下单前先用 product_unit_price 查价、user_info 查余额，并向用户确认。
         destructive: true
         params:
           bill_timelen: { enum: [1, 2, 3], description: 包月有效时长：1=30天，2=90天，3=180天；产品 6 必填，产品 1 忽略 }
       - name: order_buy_time_ip
         productTypeIds: [2, 3, 4, 8]
         title: 购买时长 IP
-        description: 会从账户余额扣费。购买静态住宅（2/3/4）或数据中心（8）时长 IP，num 为 IP 数量（1-300）。下单前先用 stock_check 检测库存、product_unit_price 查价，并向用户确认。
+        description: 会从账户余额扣费。购买静态住宅（2/3/4）或数据中心（8）时长 IP，num 为 IP 数量（1-300，数据中心单次最多 50）；数据中心不卖 7 天。下单前先用 stock_check 检测库存、product_unit_price 查价，并向用户确认。
         destructive: true
         params:
+          num: { description: 需要购买的 IP 数量，1-300；数据中心（8）单次最多 50 }
           appoint_ip: { description: 指定从哪些 IP 段购买，每项写一个 IP 段和该段要买的数量，所有 count 之和必须等于 num；不传则由系统随机分配。IP 段用 static_ip_range_list 查 }
           "appoint_ip[0][ip_str]": { description: IP 段前两位，如 104.223，填 static_ip_range_list 返回的 ipStr 值 }
           "appoint_ip[0][count]": { type: integer, description: 该段要买的 IP 数量，不能超过列表里该段的 num }
@@ -252,7 +250,7 @@ tools:
           city: { description: 城市名称，取 static_city_list 返回的 name 字段；不传则随机 }
           agree: { enum: [SOCKS5, HTTP, HTTPS], description: 协议，大写 }
           bandwidth_num: { type: integer, description: 带宽加购，单位 Mbps，不传默认 5；可选档位和价格用 bandwidth_package_list 按产品和国家查，填返回的 num；数据中心（8）没有带宽加购，不要传 }
-          timelen: { enum: [0, 1, 2, 3, 4], description: 购买时长：0=7天，1=30天，2=90天，3=180天，4=360天 } # 文档缺陷兜底：同上
+          timelen: { enum: [0, 1, 2, 3, 4], description: 购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不卖 7 天，不能选 0 }
           use_ip_port: { enum: [0, 1] }
           random_account_password: { enum: [0, 1] }
   /externalapi/product_order/createTestOrder:
@@ -260,9 +258,7 @@ tools:
     title: 购买时长测试 IP
     description: 会从账户余额按时长扣费。购买短期测试用的时长 IP，用于自有平台给用户试用；只有代理商账号能调用，普通账号会被拒绝。
     destructive: true
-    params: # 文档缺陷兜底：文档写数量 1-20，后端只放行 1-10
-      num: { description: 测试 IP 数量，1 到 10 }
-      timelen: { description: 测试时长，固定12小时 }
+    params:
       bandwidth_num: { type: integer, enum: [5, 10, 15], description: 带宽，单位 Mbps，不传默认 5；10 和 15 是否可选取决于账号等级配置 }
       agree: { enum: [SOCKS5, HTTP, HTTPS], description: 协议，大写 }
       country: { description: 国家编码，用 static_country_list 查 }
@@ -270,11 +266,12 @@ tools:
   /externalapi/product_order/createRenewProductBuyOrder:
     name: order_renew
     title: 续费时长 IP
-    description: 会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。不会改动子账号的自动续费开关；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。
+    description: 会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。数据中心不能续 7 天。不会改动子账号的自动续费开关；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。
     destructive: true
-    params: # 文档缺陷兜底：旧页只把 product_type_id 标为必填
-      timelen: { required: true, enum: [0, 1, 2, 3, 4], description: 续费时长：0=7天，1=30天，2=90天，3=180天，4=360天 }
-      sub_account_ids: { required: true, description: 要续费的子账号 id，多个用英文逗号连接，一次最多 300 个 }
+    drop: [is_renew] # 后端会把 is_renew 写回自动续费开关，由 src/renew.ts 沿用各子账号当前值，不交给模型
+    params:
+      timelen: { enum: [0, 1, 2, 3, 4], description: 续费时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不能续 7 天，不能选 0 }
+      sub_account_ids: { description: 要续费的子账号 id，多个用英文逗号连接，一次最多 300 个 }
       renew_with_bandwidth: { enum: [0, 1], description: 续费时是否包含带宽：0=不包含，1=包含。不传则沿用子账号当前的自动续费带宽设置；传了会同时改掉该设置 }
   /externalapi/product_order/createBandwidthUpgradeOrder:
     name: order_bandwidth_upgrade
@@ -284,7 +281,7 @@ tools:
     fixed: { pay_method: balance }
     drop: [pay_method]
     params:
-      subAccountIds: { description: 要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段，与 bandwidth_upgrade_price 试算时传的一致 }
+      subAccountIds: { description: 要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段；和 bandwidth_upgrade_price 试算时是同一批子账号，只是那边的参数名叫 sub_accounts }
       "subAccountIds[]": { required: true }
       product_type_id: { enum: [2, 3, 4, 8] }
       bandwidth_num: { type: integer, required: true }

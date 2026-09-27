@@ -35,7 +35,7 @@ paths:
                   example: 1
                   type: integer
                 num:
-                  description: 需要购买的流量数量。单位：GB。范围：1-1024GB之间
+                  description: 需要购买的流量数量。单位：GB。范围：1-300GB之间。如果要购买更多，请多次请求
                   example: 2
                   type: integer
               required:

@@ -1,4 +1,4 @@
-# 购买静态住宅（数据中心）时长测试IP
+# 购买数据中心时长测试IP
 
 ## OpenAPI Specification
 
@@ -11,9 +11,10 @@ info:
 paths:
   /externalapi/product_order/createTestOrder:
     post:
-      summary: 购买静态住宅（数据中心）时长测试IP
+      summary: 购买数据中心时长测试IP
       deprecated: false
-      description: 购买数据中心时长测试IP，购买测试IP通常用于自有平台短期时长购买，用户赠送给自有用户测试，购买会按照时长扣费
+      description: >-
+        购买数据中心时长测试IP，购买测试IP通常用于自有平台短期时长购买，用户赠送给自有用户测试，购买会按照时长扣费。仅代理商账号可调用，普通账号无权操作
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -35,11 +36,11 @@ paths:
                   example: 8
                   type: integer
                 num:
-                  description: 需要短期购买的子账号数量。范围：1-20之间
+                  description: 需要短期购买的子账号数量。范围：1-10之间
                   example: 1
                   type: integer
                 timelen:
-                  description: 时长计费：固定为12小时
+                  description: 测试时长，单位小时；普通账号固定传 12
                   example: 12
                   type: integer
                 agree:

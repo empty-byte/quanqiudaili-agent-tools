@@ -31,9 +31,9 @@ paths:
               type: object
               properties:
                 product_type_id:
+                  type: integer
                   description: 产品类型id，此处固定类别为：1
-                  example: '1'
-                  type: string
+                  example: 1
                 content[0][id]:
                   type: string
                   description: 子账号id
@@ -59,6 +59,7 @@ paths:
                   example: passwordxxx2
                   type: string
               required:
+                - product_type_id
                 - content[0][id]
                 - content[0][customUsername]
                 - content[0][customPassword]

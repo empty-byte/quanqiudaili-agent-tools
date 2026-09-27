@@ -47,7 +47,7 @@ paths:
             type: string
         - name: ip_str
           in: query
-          description: ''
+          description: IP段前缀，写前 2 段，如 38.30
           required: false
           example: '192.200'
           schema:

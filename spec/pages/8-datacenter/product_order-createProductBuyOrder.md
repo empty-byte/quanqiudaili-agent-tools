@@ -35,11 +35,11 @@ paths:
                   example: 8
                   type: integer
                 num:
-                  description: 需要购买的子账号数量。范围：1-300之间
+                  description: 需要购买的子账号数量。范围：1-50之间
                   example: 1
                   type: integer
                 timelen:
-                  description: 时长计费类型：1=30天，2=90天，3=180天，4=360天，5=3天
+                  description: 时长计费类型：1=30天，2=90天，3=180天，4=360天
                   example: 1
                   type: integer
                 agree:
@@ -54,7 +54,7 @@ paths:
                   type: string
                 city:
                   description: >-
-                    数据中心城市名称。在<a href='/api-222488747'
+                    数据中心城市名称。在<a href='/222488748e0'
                     target='_blank'>数据中心城市列表</a>可获取城市名称。不传默认随机。
                   example: Los Angeles
                   type: string

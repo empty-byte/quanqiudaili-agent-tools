@@ -19,35 +19,37 @@ paths:
       parameters:
         - name: product_type_id
           in: query
-          description: 产品类型
-          required: false
-          example: '3'
+          description: 产品类型。2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）
+          required: true
+          example: 3
           schema:
-            type: string
+            type: integer
         - name: subAccount
           in: query
           description: 子账号id
-          required: false
-          example: '33'
+          required: true
+          example: 33
           schema:
-            type: string
+            type: integer
         - name: trend_type
           in: query
-          description: 带宽监控趋势类型:1=实时监控,2=历史趋势
-          required: false
-          example: '1'
+          description: >-
+            带宽监控趋势类型:1=实时，固定取最近 60 分钟，忽略 startTime/endTime；2=历史，按
+            startTime/endTime 取
+          required: true
+          example: 1
           schema:
-            type: string
+            type: integer
         - name: startTime
           in: query
-          description: 开始时间(历史趋势必填)
+          description: 开始时间。历史趋势可选，不传默认最近 1 天；跨度不能超过 2 天
           required: false
           example: '1755273600'
           schema:
             type: string
         - name: endTime
           in: query
-          description: 结束时间(历史趋势必填)
+          description: 结束时间。历史趋势可选，不传默认最近 1 天；跨度不能超过 2 天
           required: false
           example: '1755273601'
           schema:

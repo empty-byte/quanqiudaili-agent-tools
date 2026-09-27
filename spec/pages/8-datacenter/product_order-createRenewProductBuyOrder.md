@@ -13,11 +13,8 @@ paths:
     post:
       summary: 续费数据中心时长IP
       deprecated: false
-      description: >
+      description: |
         续费数据中心时长IP
-
-        注意：content参数是一个数组。对应content[].ids[]也是一个数组。根据国家进行分类组合。一个国家可以有对个id进行续费。可以有很多个国家的ip。
-        content参数可见示例：包含了2个国家（US，UK）续费。第一个国家US又有2个ip（id = 8，id = 9）进行续费。
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -39,12 +36,12 @@ paths:
                   example: 8
                   type: integer
                 timelen:
-                  description: 时长计费类型：0=7天，1=30天，2=90天，3=180天，4=360天
+                  description: 时长计费类型：1=30天，2=90天，3=180天，4=360天
                   example: 0
                   type: integer
                 sub_account_ids:
                   type: string
-                  description: 续费的子账号id，多个以英文逗号连接
+                  description: 续费的子账号id，多个以英文逗号连接，单次最多 300 个
                   example: 1,2
               required:
                 - product_type_id

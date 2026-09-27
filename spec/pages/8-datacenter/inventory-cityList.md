@@ -28,7 +28,7 @@ paths:
           in: query
           description: >-
             国家id。可从<a href='/api-222488747'
-            target='_blank'>数据中心国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>数据中心国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: '1804'
           schema:
@@ -37,7 +37,7 @@ paths:
           in: query
           description: >-
             国家code。可从<a href='/api-222488747'
-            target='_blank'>数据中心国家列表获取</a>。country_id 和 country_code 二选一
+            target='_blank'>数据中心国家列表获取</a>。都可以不传，不传返回该产品全部城市；传一个就按该国家筛选；两个都传必须是同一个国家，否则报错
           required: false
           example: US
           schema:
@@ -59,54 +59,42 @@ paths:
                 properties:
                   code:
                     type: integer
-                    description: 响应编码:1=正常,0=错误
                   msg:
                     type: string
-                    description: 响应说明
                   time:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      countrys:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              title: 国家id。即：country_id
-                            name:
-                              type: string
-                              title: 国家名称
-                            image:
-                              type: string
-                            code:
-                              type: string
-                              title: 国家编码
-                            type_text:
-                              type: string
-                            status_text:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                          x-apifox-orders:
-                            - id
-                            - name
-                            - image
-                            - code
-                            - type_text
-                            - status_text
-                        title: 国家列表
-                    required:
-                      - countrys
-                    x-apifox-orders:
-                      - countrys
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                          description: 城市名称
+                        code:
+                          type: string
+                          description: 城市编码
+                        country_id:
+                          type: integer
+                          description: 国家id
+                        country_code:
+                          type: string
+                          description: 国家编码
+                      required:
+                        - id
+                        - name
+                        - code
+                        - country_id
+                        - country_code
+                      x-apifox-orders:
+                        - id
+                        - name
+                        - code
+                        - country_id
+                        - country_code
+                      description: 城市列表
                 required:
                   - code
                   - msg
@@ -120,21 +108,33 @@ paths:
               example:
                 code: 1
                 msg: 获取成功!
-                time: '1697680105'
+                time: '1790486984'
                 data:
-                  countrys:
-                    - id: 11
-                      name: 美国
-                      image: ''
-                      code: US
-                      type_text: ''
-                      status_text: ''
-                    - id: 12
-                      name: 中国台湾省
-                      image: ''
-                      code: TW
-                      type_text: ''
-                      status_text: ''
+                  - id: 3920
+                    name: New York City
+                    code: New York City
+                    country_id: 565
+                    country_code: US
+                  - id: 3923
+                    name: Chino
+                    code: Chino
+                    country_id: 565
+                    country_code: US
+                  - id: 3924
+                    name: La Mirada
+                    code: La Mirada
+                    country_id: 565
+                    country_code: US
+                  - id: 3936
+                    name: Los Angeles
+                    code: Los Angeles
+                    country_id: 565
+                    country_code: US
+                  - id: 3937
+                    name: Washington
+                    code: Washington
+                    country_id: 565
+                    country_code: US
           headers: {}
           x-apifox-name: 成功
       security: []

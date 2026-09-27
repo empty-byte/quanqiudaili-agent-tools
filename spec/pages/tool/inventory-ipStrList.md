@@ -78,7 +78,7 @@ paths:
                   example: Los Angeles
                   type: string
                 ip_str:
-                  description: 需要查询的ip段A段信息，如：38   ；150  ；
+                  description: IP段前缀，写前 1 到 2 段，如 38 或 38.30
                   example: '38'
                   type: string
                 exclude_ip_str:
@@ -87,7 +87,6 @@ paths:
                   type: string
               required:
                 - product_type_id
-                - country_code
             examples: {}
       responses:
         '200':
@@ -108,38 +107,55 @@ paths:
                   data:
                     type: object
                     properties:
+                      current_page:
+                        type: integer
+                      last_page:
+                        type: integer
                       total:
                         type: integer
                         description: 总数
-                      rows:
+                      data:
                         type: array
                         items:
                           type: object
                           properties:
-                            id:
-                              type: integer
-                              description: id
-                            infor:
+                            ipStr:
                               type: string
-                              description: 白名单ip
+                              description: IP段
+                            type:
+                              type: integer
+                            remark:
+                              type: string
+                              description: 库存备注
+                            skuStatus:
+                              type: integer
+                              description: 库存标识:0=充足,1=紧缺
                           required:
-                            - id
-                            - infor
+                            - ipStr
+                            - type
+                            - remark
+                            - skuStatus
                           x-apifox-orders:
-                            - id
-                            - infor
+                            - ipStr
+                            - type
+                            - remark
+                            - skuStatus
                     required:
+                      - current_page
+                      - last_page
                       - total
-                      - rows
+                      - data
                     x-apifox-orders:
+                      - current_page
+                      - last_page
                       - total
-                      - rows
-                x-apifox-orders:
+                      - data
+                required:
                   - code
                   - msg
                   - time
                   - data
-                required:
+                x-apifox-orders:
                   - code
                   - msg
                   - time
@@ -147,49 +163,13 @@ paths:
               example:
                 code: 1
                 msg: 库存获取成功!
-                time: '1748939470'
+                time: '1790489215'
                 data:
                   current_page: 1
-                  last_page: 6
-                  total: 53
+                  last_page: 3
+                  total: 24
                   data:
-                    - ipStr: 23.247.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 23.247.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 192.200.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 192.200.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
-                      type: 1
-                      remark: 紧张
-                      skuStatus: 1
-                    - ipStr: 149.52.**.**
+                    - ipStr: '38.30'
                       type: 1
                       remark: 紧张
                       skuStatus: 1

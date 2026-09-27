@@ -99,172 +99,157 @@ paths:
                 properties:
                   code:
                     type: integer
-                    description: 响应编码:1=正常,0=错误
                   msg:
                     type: string
-                    description: 错误说明
                   time:
                     type: string
-                    description: 响应时间戳
                   data:
                     type: object
                     properties:
                       total:
                         type: integer
-                        description: 总数
                       rows:
                         type: array
                         items:
                           type: object
                           properties:
-                            password:
-                              type: string
-                              description: 子账号密码
-                            username:
-                              type: string
-                              description: 子账号用户名
                             id:
-                              type: integer
-                              description: 子账号编码
-                            is_bind:
                               type: string
-                              description: 是否绑定
-                            bindUser:
-                              type: string
-                              description: 绑定的账户
-                            bindPassword:
-                              type: string
-                              description: 绑定的账户密码
-                            createTime:
-                              type: string
-                              description: 添加时间
-                            port:
-                              type: integer
-                              description: 端口
-                            agree:
-                              type: string
-                              description: 协议
-                            target:
-                              type: string
-                              description: 加速通道
-                            ip:
-                              type: string
-                              description: 出口ip
-                            bill:
-                              type: integer
-                              description: 消耗流量
                             is_diff:
                               type: integer
-                              description: 是否去重
+                            agree:
+                              type: string
                             country:
                               type: string
-                              description: 国家Code
-                            countryName:
+                            target:
                               type: string
-                              description: 国家名称
+                            port:
+                              type: integer
+                            username:
+                              type: string
+                            password:
+                              type: string
+                            is_bind:
+                              type: string
+                            remark:
+                              type: string
+                            poolStatus:
+                              type: string
+                            bindUser:
+                              type: string
+                            bindPassword:
+                              type: string
+                            ip:
+                              type: string
+                            countdown:
+                              type: string
+                            expiresIn:
+                              type: integer
+                            createtime:
+                              type: string
                             state:
                               type: string
-                              description: 省/市
+                            portEnable:
+                              type: integer
                             city:
                               type: string
-                              description: 城市
-                            type:
+                            bill:
+                              type: integer
+                            countryName:
                               type: string
                             status:
+                              type: integer
+                            expireDate:
                               type: string
-                          required:
-                            - password
-                            - username
-                            - id
-                            - is_bind
-                            - bindUser
-                            - bindPassword
-                            - createTime
-                            - port
-                            - agree
-                            - target
-                            - ip
-                            - bill
-                            - is_diff
-                            - country
-                            - countryName
-                            - state
-                            - city
-                            - type
-                            - status
+                            expiresDate:
+                              type: string
+                            order_back_date_valid:
+                              type: boolean
+                            bandwidth_num:
+                              type: integer
+                            order_product_buy_id:
+                              type: integer
+                            order_back_status:
+                              type: integer
+                            is_renew:
+                              type: integer
+                            renew_with_bandwidth:
+                              type: integer
+                            order_back_reject_reason:
+                              type: string
+                            renewtime:
+                              type: string
                           x-apifox-orders:
-                            - password
-                            - username
                             - id
+                            - is_diff
+                            - agree
+                            - country
+                            - target
+                            - port
+                            - username
+                            - password
                             - is_bind
+                            - remark
+                            - poolStatus
                             - bindUser
                             - bindPassword
-                            - createTime
-                            - port
-                            - agree
-                            - target
                             - ip
-                            - bill
-                            - is_diff
-                            - country
-                            - countryName
+                            - countdown
+                            - expiresIn
+                            - createtime
                             - state
+                            - portEnable
                             - city
-                            - type
+                            - bill
+                            - countryName
                             - status
-                        description: 响应内容
-                      baseFlow:
-                        type: number
-                        description: 剩余基准流量
+                            - expireDate
+                            - expiresDate
+                            - order_back_date_valid
+                            - bandwidth_num
+                            - order_product_buy_id
+                            - order_back_status
+                            - is_renew
+                            - renew_with_bandwidth
+                            - order_back_reject_reason
+                            - renewtime
                       countryList:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            countryName:
-                              type: string
-                              description: 城市名称
-                            country:
-                              type: string
-                              description: 城市编码
-                            conutry:
-                              type: string
-                            type_text:
-                              type: string
-                            status_text:
-                              type: string
-                          required:
-                            - id
-                            - countryName
-                            - conutry
-                            - type_text
-                            - status_text
-                          x-apifox-orders:
-                            - id
-                            - countryName
-                            - country
-                            - conutry
-                            - type_text
-                            - status_text
-                        description: 城市列表(用于城市搜索)
+                          type: string
+                      base:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          normal:
+                            type: integer
+                          expiring_soon:
+                            type: integer
+                        required:
+                          - total
+                          - normal
+                          - expiring_soon
+                        x-apifox-orders:
+                          - total
+                          - normal
+                          - expiring_soon
                     required:
                       - total
                       - rows
-                      - baseFlow
                       - countryList
+                      - base
                     x-apifox-orders:
                       - total
                       - rows
-                      - baseFlow
                       - countryList
-                x-apifox-orders:
+                      - base
+                required:
                   - code
                   - msg
                   - time
                   - data
-                required:
+                x-apifox-orders:
                   - code
                   - msg
                   - time
@@ -272,49 +257,48 @@ paths:
               example:
                 code: 1
                 msg: 获取成功
-                time: '1697164784'
+                time: '1790492714'
                 data:
                   total: 1
                   rows:
-                    - password: '111222'
-                      username: demo-824
-                      id: 824
-                      is_bind: 否
-                      bindUser: demo-824
-                      bindPassword: '111222'
-                      createTime: '2023-10-13 09:38:14'
-                      port: 5001
-                      agree: HTTP
-                      target: demo.demo.com
-                      ip: ''
-                      bill: 0
+                    - id: '1'
                       is_diff: 0
-                      country: ''
-                      countryName: 全球
-                      state: ''
-                      city: ''
-                      type: '0'
-                      status: '0'
-                  baseFlow: 180.31
-                  countryList:
-                    - id: 1
-                      countryName: 全球随机
-                      country: ALL
-                    - id: 1671
-                      conutry: AX
-                      countryName: 奥兰
-                      type_text: ''
-                      status_text: ''
-                    - id: 1672
-                      conutry: AL
-                      countryName: 阿尔巴尼亚
-                      type_text: ''
-                      status_text: ''
-                    - id: 4038
-                      conutry: XK
-                      countryName: 科索沃
-                      type_text: ''
-                      status_text: ''
+                      agree: SOCKS5
+                      country: US
+                      target: proxy.quanqiudaili.com
+                      port: 5001
+                      username: gp60077sctisp-1
+                      password: skywxku2
+                      is_bind: '0'
+                      remark: ''
+                      poolStatus: online
+                      bindUser: gp60077sctisp-1
+                      bindPassword: skywxku2
+                      ip: 207.180.30.78
+                      countdown: 30.0天
+                      expiresIn: 1793084710
+                      createtime: '2026-09-27 15:05:11'
+                      state: New York
+                      portEnable: 0
+                      city: New York City
+                      bill: 0
+                      countryName: 美国
+                      status: 1
+                      expireDate: '2026-10-27 15:05:10'
+                      expiresDate: '2026-10-27 15:05:10'
+                      order_back_date_valid: true
+                      bandwidth_num: 5
+                      order_product_buy_id: 0
+                      order_back_status: 0
+                      is_renew: 0
+                      renew_with_bandwidth: 0
+                      order_back_reject_reason: ''
+                      renewtime: ''
+                  countryList: []
+                  base:
+                    total: 0
+                    normal: 0
+                    expiring_soon: 0
           headers: {}
           x-apifox-name: 成功
       security: []
