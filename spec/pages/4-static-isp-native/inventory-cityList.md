@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取静态住宅（运营商原生）对应城市列表
       deprecated: false
-      description: 获取静态住宅（运营商原生）时长对应国家列表
+      description: 获取静态住宅（运营商原生）时长对应城市列表
       tags:
         - 用户IP子账号管理/静态住宅（运营商原生）时长子账号
       parameters:

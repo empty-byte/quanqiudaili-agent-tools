@@ -13,7 +13,7 @@ paths:
     post:
       summary: 添加动态住宅流量（包月）子账号
       deprecated: false
-      description: 添加动态住宅流量子账号
+      description: 添加动态住宅（包月）流量子账号
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:

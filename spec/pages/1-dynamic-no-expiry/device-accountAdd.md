@@ -13,7 +13,7 @@ paths:
     post:
       summary: 添加动态住宅流量子账号
       deprecated: false
-      description: 添加动态住宅流量子账号
+      description: 添加动态住宅（不限时长）流量子账号
       tags:
         - 用户IP子账号管理/动态住宅流量子账号（不限时长）
       parameters:
@@ -186,35 +186,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 创建成功!
-                time: '1752746761'
-                data:
-                  - password: test
-                    username: test-60
-                    id: 60
-                    is_bind: 否
-                    bindUser: test
-                    disabled: 0
-                    bindPassword: z4b8zhwl
-                    createTime: '2025-07-17 18:06:03'
-                    port: 5001
-                    agree: SOCKS5
-                    target: proxy.quanqiudaili.com
-                    poolStatus: ''
-                    changeInterval: 300
-                    expiresIn: 0
-                    expiresDate: '1970-01-01 08:00:00'
-                    ip: ''
-                    bill: '0.00'
-                    is_diff: 0
-                    country: US
-                    countryName: 美国
-                    state: ''
-                    remark: ''
-                    city: ''
-                    limit_flow: 0
           headers: {}
           x-apifox-name: 成功
       security: []

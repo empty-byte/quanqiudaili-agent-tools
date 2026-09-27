@@ -13,7 +13,7 @@ paths:
     post:
       summary: 购买动态住宅流量（包月）
       deprecated: false
-      description: 购买动态住宅流量
+      description: 购买动态住宅（包月）流量
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:

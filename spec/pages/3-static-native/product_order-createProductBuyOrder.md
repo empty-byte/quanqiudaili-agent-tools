@@ -13,7 +13,7 @@ paths:
     post:
       summary: 购买静态住宅（原生）时长IP
       deprecated: false
-      description: 购买静态住宅时长IP
+      description: 购买静态住宅（原生）时长IP
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:
@@ -216,6 +216,34 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 购买成功
+                time: '1746667816'
+                data:
+                  sub_accounts:
+                    - password: test
+                      username: test
+                      id: 9
+                      is_bind: 否
+                      bindUser: test
+                      disabled: 0
+                      bindPassword: test
+                      createTime: '2025-05-08 09:30:17'
+                      port: 5001
+                      agree: SOCKS5
+                      target: proxy.quanqiudaili.com
+                      changeInterval: 0
+                      expiresIn: 1747272617
+                      ip: 38.30.214.96
+                      bill: '0.00'
+                      is_diff: 0
+                      country: US
+                      countryName: 美国
+                      state: California
+                      remark: ''
+                      city: Los Angeles
+                  order_number: 20250508093017ekVwhy
           headers: {}
           x-apifox-name: 成功
       security: []

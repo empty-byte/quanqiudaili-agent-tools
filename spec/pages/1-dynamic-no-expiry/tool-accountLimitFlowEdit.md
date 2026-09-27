@@ -13,7 +13,7 @@ paths:
     post:
       summary: 设置子账号流量上限
       deprecated: false
-      description: ''
+      description: 设置动态住宅（不限时长）子账号流量上限
       tags:
         - 用户IP子账号管理/动态住宅流量子账号（不限时长）
       parameters:

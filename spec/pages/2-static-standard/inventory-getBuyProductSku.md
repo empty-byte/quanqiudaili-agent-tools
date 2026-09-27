@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取静态住宅（普通非原生）地区库存详情
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取静态住宅（普通非原生）时长对应地区库存详情
       tags:
         - 用户IP子账号管理/静态住宅（普通非原生）时长子账号
       parameters:
@@ -105,6 +105,19 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: ok
+                time: '1750044858'
+                data:
+                  - country_id: 1770
+                    city_id: 3002835
+                    country_name: 中国香港
+                    country_code: HK
+                    city_name: Hong Kong
+                    use_random_city: 1
+                    remark: 充足
+                    sku_status: 0
           headers: {}
           x-apifox-name: 成功
       security: []

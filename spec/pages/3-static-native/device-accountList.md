@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取静态住宅（原生）子账号列表
       deprecated: false
-      description: 获取静态住宅原生子账号列表
+      description: 获取静态住宅（原生）子账号列表
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:

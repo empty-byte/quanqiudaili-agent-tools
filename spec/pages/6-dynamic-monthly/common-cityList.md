@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取动态住宅（包月）对应城市列表
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取动态住宅（包月）对应城市列表
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:

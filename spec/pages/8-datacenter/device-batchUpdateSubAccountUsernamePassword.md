@@ -13,7 +13,7 @@ paths:
     post:
       summary: 自定义数据中心IP子账号用户名和密码
       deprecated: false
-      description: ''
+      description: 自定义数据中心IP子账号用户名和密码
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -62,6 +62,7 @@ paths:
                 - content[0][id]
                 - content[0][customUsername]
                 - content[0][customPassword]
+            examples: {}
       responses:
         '200':
           description: ''

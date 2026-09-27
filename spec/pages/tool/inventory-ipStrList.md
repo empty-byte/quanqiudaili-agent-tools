@@ -66,7 +66,7 @@ paths:
               type: object
               properties:
                 product_type_id:
-                  description: 产品id:2=静态住宅非原生;3=静态住宅原生;8=数据中心
+                  description: 产品id:2=静态住宅（非原生）;3=静态住宅（原生）;4=静态住宅（运营商原生）;8=数据中心
                   example: '3'
                   type: string
                 country_code:
@@ -85,6 +85,9 @@ paths:
                   description: 需要排除掉的ip段
                   example: '38.31'
                   type: string
+              required:
+                - product_type_id
+                - country_code
             examples: {}
       responses:
         '200':

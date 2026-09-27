@@ -13,7 +13,7 @@ paths:
     post:
       summary: '静态住宅（普通非原生）库存检测 '
       deprecated: false
-      description: 购买静态住宅时长IP前的库存检测
+      description: 购买静态住宅（普通非原生）时长IP前的库存检测
       tags:
         - 用户IP子账号管理/静态住宅（普通非原生）时长子账号
       parameters:

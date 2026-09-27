@@ -13,7 +13,7 @@ paths:
     put:
       summary: 自定义静态住宅（运营商原生）IP子账号用户名和密码
       deprecated: false
-      description: ''
+      description: 自定义静态住宅（运营商原生）IP子账号用户名和密码
       tags:
         - 用户IP子账号管理/静态住宅（运营商原生）时长子账号
       parameters:

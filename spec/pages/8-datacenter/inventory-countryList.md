@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取数据中心对应国家列表
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取数据中心时长对应国家列表
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -77,24 +77,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 获取成功!
-                time: '1697680105'
-                data:
-                  countrys:
-                    - id: 11
-                      name: 美国
-                      image: ''
-                      code: US
-                      type_text: ''
-                      status_text: ''
-                    - id: 12
-                      name: 中国台湾省
-                      image: ''
-                      code: TW
-                      type_text: ''
-                      status_text: ''
           headers: {}
           x-apifox-name: 成功
       security: []

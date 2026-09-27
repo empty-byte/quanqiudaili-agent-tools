@@ -14,7 +14,7 @@ paths:
       summary: 续费静态住宅（原生）时长IP
       deprecated: false
       description: >
-        续费静态住宅时长IP
+        续费静态住宅（原生）时长IP
 
         注意：content参数是一个数组。对应content[].ids[]也是一个数组。根据国家进行分类组合。一个国家可以有对个id进行续费。可以有很多个国家的ip。
         content参数可见示例：包含了2个国家（US，UK）续费。第一个国家US又有2个ip（id = 8，id = 9）进行续费。

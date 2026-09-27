@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取动态住宅流量（包月）子账号列表
       deprecated: false
-      description: 获取动态住宅流量子账号列表
+      description: 获取动态住宅（包月）流量子账号列表
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:
@@ -142,18 +142,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 获取成功
-                time: '1752746322'
-                data:
-                  total: 0
-                  rows: []
-                  base:
-                    totalFlow: '1.00'
-                    useFlow: '0.00'
-                    baseFlow: '1.00'
-                    expiresIn: '2024-06-28 10:06:23'
           headers: {}
           x-apifox-name: 成功
       security: []

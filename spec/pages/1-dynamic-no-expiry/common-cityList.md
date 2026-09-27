@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取动态住宅对应城市列表
       deprecated: false
-      description: 获取动态住宅时长对应城市列表
+      description: 获取动态住宅（不限时长）对应城市列表
       tags:
         - 用户IP子账号管理/动态住宅流量子账号（不限时长）
       parameters:
@@ -88,15 +88,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 获取成功!
-                time: '1752746716'
-                data:
-                  - name: Tin Shui Wai
-                    code: Tin Shui Wai
-                    state_name: Yuen Long
-                    country_name: 中国香港
           headers: {}
           x-apifox-name: 成功
       security: []

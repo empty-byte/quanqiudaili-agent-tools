@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取子账号流量上限
       deprecated: false
-      description: ''
+      description: 获取动态住宅（包月）子账号流量上限
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:

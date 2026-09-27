@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取静态住宅（原生）对应城市列表
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取静态住宅（原生）时长对应城市列表
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:
@@ -101,6 +101,63 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1753173843'
+                data:
+                  - id: 3902
+                    name: New York City
+                    code: New York City
+                    country_id: 653
+                  - id: 3905
+                    name: Chicago
+                    code: Chicago
+                    country_id: 653
+                  - id: 3906
+                    name: Seattle
+                    code: Seattle
+                    country_id: 653
+                  - id: 3909
+                    name: Dallas
+                    code: Dallas
+                    country_id: 653
+                  - id: 3910
+                    name: Houston
+                    code: Houston
+                    country_id: 653
+                  - id: 3911
+                    name: Los Angeles
+                    code: Los Angeles
+                    country_id: 653
+                  - id: 3912
+                    name: San Francisco
+                    code: San Francisco
+                    country_id: 653
+                  - id: 3913
+                    name: Las Vegas
+                    code: Las Vegas
+                    country_id: 653
+                  - id: 3914
+                    name: Phoenix
+                    code: Phoenix
+                    country_id: 653
+                  - id: 3915
+                    name: Washington
+                    code: Washington
+                    country_id: 653
+                  - id: 3916
+                    name: Boston
+                    code: Boston
+                    country_id: 653
+                  - id: 3917
+                    name: Philadelphia
+                    code: Philadelphia
+                    country_id: 653
+                  - id: 3950
+                    name: Columbia
+                    code: Columbia
+                    country_id: 653
           headers: {}
           x-apifox-name: 成功
       security: []

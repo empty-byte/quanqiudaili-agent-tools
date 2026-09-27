@@ -13,7 +13,7 @@ paths:
     get:
       summary: 查询静态住宅（原生）IP段列表
       deprecated: false
-      description: 获取IP段列表
+      description: 查询静态住宅（原生）IP段列表
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:
@@ -27,7 +27,7 @@ paths:
         - name: country_code
           in: query
           description: 国家code
-          required: true
+          required: false
           example: US
           schema:
             type: string

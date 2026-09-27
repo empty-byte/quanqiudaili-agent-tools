@@ -13,7 +13,7 @@ paths:
     put:
       summary: 自定义静态住宅（原生）批量开关直连
       deprecated: false
-      description: ''
+      description: 自定义静态住宅（原生）批量开关直连
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:

@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取数据中心地区库存详情
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取数据中心地区库存详情
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -27,7 +27,7 @@ paths:
         - name: country_code
           in: query
           description: 国家code。
-          required: false
+          required: true
           example: US
           schema:
             type: string

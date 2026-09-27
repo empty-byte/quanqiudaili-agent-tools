@@ -13,7 +13,7 @@ paths:
     put:
       summary: 修改动态住宅（包月）子账号信息
       deprecated: false
-      description: 修改动态住宅子账号信息
+      description: 修改动态住宅（包月）子账号信息
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:
@@ -45,6 +45,7 @@ paths:
               required:
                 - product_type_id
                 - id
+            examples: {}
       responses:
         '200':
           description: ''

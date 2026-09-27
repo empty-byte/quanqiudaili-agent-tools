@@ -13,7 +13,7 @@ paths:
     post:
       summary: 购买静态住宅（普通非原生）时长IP
       deprecated: false
-      description: 购买静态住宅时长IP
+      description: 购买静态住宅（普通非原生）时长IP
       tags:
         - 用户IP子账号管理/静态住宅（普通非原生）时长子账号
       parameters:
@@ -222,6 +222,72 @@ paths:
                   - msg
                   - time
                   - data
+              examples:
+                '1':
+                  summary: 成功示例
+                  value:
+                    code: 1
+                    msg: 获取成功
+                    time: '1697164784'
+                    data:
+                      total: 1
+                      rows:
+                        - id: '1'
+                          is_diff: 0
+                          agree: SOCKS5
+                          country: US
+                          target: proxy.quanqiudaili.com
+                          port: 5001
+                          username: test
+                          password: test
+                          is_bind: '0'
+                          remark: ''
+                          poolStatus: online
+                          bindUser: test
+                          bindPassword: test
+                          ip: 172.11.11.11
+                          countdown: 7.0天
+                          expiresIn: 1747108219
+                          createtime: '2025-05-06 11:50:20'
+                          state: New York
+                          city: New York City
+                          bill: 0
+                          countryName: 美国
+                          status: 1
+                          expireDate: '2025-05-13 11:50:19'
+                          order_back_date_valid: true
+                          order_product_buy_id: 16874
+                          order_back_status: 0
+                          is_renew: '0'
+                          order_back_reject_reason: null
+                          renewtime: '1970-01-01'
+                      baseFlow: 180.31
+                      countryList:
+                        - id: 1
+                          countryName: 全球随机
+                          country: ALL
+                        - id: 1671
+                          conutry: AX
+                          countryName: 奥兰
+                          type_text: ''
+                          status_text: ''
+                        - id: 1672
+                          conutry: AL
+                          countryName: 阿尔巴尼亚
+                          type_text: ''
+                          status_text: ''
+                        - id: 4038
+                          conutry: XK
+                          countryName: 科索沃
+                          type_text: ''
+                          status_text: ''
+                '2':
+                  summary: 异常示例
+                  value:
+                    code: 0
+                    msg: 该产品已售罄，请选择其它产品
+                    time: '1753154934'
+                    data: null
           headers: {}
           x-apifox-name: 成功
       security: []

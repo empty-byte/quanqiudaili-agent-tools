@@ -1,4 +1,4 @@
-# 查询静态住宅（普通）IP段列表
+# 查询静态住宅（普通非原生）IP段列表
 
 ## OpenAPI Specification
 
@@ -11,9 +11,9 @@ info:
 paths:
   /externalapi/inventory/ipStrList:
     post:
-      summary: 查询静态住宅（普通）IP段列表
+      summary: 查询静态住宅（普通非原生）IP段列表
       deprecated: false
-      description: 获取IP段列表
+      description: 获取静态住宅（普通非原生）IP段列表
       tags:
         - 用户IP子账号管理/静态住宅（普通非原生）时长子账号
       parameters:
@@ -31,9 +31,9 @@ paths:
               type: object
               properties:
                 product_type_id:
+                  type: integer
                   description: 产品id:此处固定2
-                  example: '2'
-                  type: string
+                  example: 2
                 country_code:
                   description: 国家code
                   example: US
@@ -59,6 +59,8 @@ paths:
                   description: 数量
                   example: '10'
                   type: string
+              required:
+                - product_type_id
             examples: {}
       responses:
         '200':

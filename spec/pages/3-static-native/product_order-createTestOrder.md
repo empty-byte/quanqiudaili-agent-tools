@@ -13,7 +13,7 @@ paths:
     post:
       summary: 购买静态住宅（原生）时长测试IP
       deprecated: false
-      description: 购买静态住宅时长测试IP，购买测试IP通常用于自有平台短期时长购买，购买会按照时长扣费
+      description: 购买静态住宅（原生）时长测试IP，购买测试IP通常用于自有平台短期时长购买，购买会按照时长扣费
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:
@@ -274,63 +274,6 @@ paths:
                   - msg
                   - time
                   - data
-              examples:
-                '1':
-                  summary: 成功示例
-                  value:
-                    code: 1
-                    msg: ok
-                    time: '1755667649'
-                    data:
-                      orderProductBuy:
-                        user_id: 77
-                        order_number: 20250820132733kNewGL
-                        description: 【独享静态住宅（本土原生）】，国家/地区：US，城市：，数量：1
-                        pay_gateway: 3
-                        order_status: 2
-                        order_category: 4
-                        origin_money: '6.00'
-                        real_money: '6.00'
-                        balance: '0.07'
-                        createtime: 1755667653
-                        product_type_id: 3
-                        scope_native: local
-                        scene: ''
-                        buy_num: '1'
-                        country: US
-                        area: ''
-                        id: '43550'
-                      rows:
-                        - password: test
-                          username: test
-                          id: 11
-                          is_bind: 否
-                          bindUser: test
-                          disabled: 0
-                          bindPassword: test
-                          createTime: '2025-08-20 13:27:32'
-                          port: 5001
-                          agree: SOCKS5
-                          target: proxy.quanqiudaili.com
-                          poolStatus: ''
-                          changeInterval: 0
-                          expiresIn: 1755926851
-                          expiresDate: '2025-08-23 13:27:31'
-                          ip: 96.62.48.237
-                          bill: '0.00'
-                          is_diff: 0
-                          country: US
-                          countryName: 美国
-                          state: ''
-                          remark: ''
-                          city: ''
-                '2':
-                  summary: 异常示例
-                  value:
-                    code: 0
-                    msg: 您没有赠送该类别产品71小时的权限
-                    time: '1755667566'
-                    data: null
           headers: {}
           x-apifox-name: 成功
       security: []

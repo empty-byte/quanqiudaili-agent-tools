@@ -13,7 +13,7 @@ paths:
     post:
       summary: 购买数据中心时长IP
       deprecated: false
-      description: 购买静态住宅时长IP
+      description: 购买数据中心时长IP
       tags:
         - 用户IP子账号管理/数据中心时长子账号
       parameters:
@@ -64,6 +64,7 @@ paths:
                 - timelen
                 - agree
                 - country
+            examples: {}
       responses:
         '200':
           description: ''
@@ -184,6 +185,32 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 购买成功
+                time: '1697513125'
+                data:
+                  subAccounts:
+                    - id: '22'
+                      is_diff: 0
+                      agree: SOCKS5
+                      country: US
+                      ip: 127.0.0.1
+                      target: demo.demo.com
+                      port: 5001
+                      username: demo-22
+                      password: demo
+                      is_bind: 否
+                      remark: ''
+                      bindUser: demo-22
+                      bindPassword: demo
+                      countdown: 30.0天
+                      createtime: '1970-01-01 08:00:00'
+                      state: ''
+                      city: ''
+                      bill: 0
+                      countryName: 美国
+                      status: 1
           headers: {}
           x-apifox-name: 成功
       security: []

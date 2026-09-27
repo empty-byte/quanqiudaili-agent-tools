@@ -13,7 +13,7 @@ paths:
     get:
       summary: 获取动态住宅（包月）对应国家列表
       deprecated: false
-      description: 获取静态住宅时长对应国家列表
+      description: 获取动态住宅（包月）对应国家列表
       tags:
         - 用户IP子账号管理/动态住宅流量子账号 （包月）
       parameters:
@@ -77,17 +77,6 @@ paths:
                   - msg
                   - time
                   - data
-              example:
-                code: 1
-                msg: 获取成功!
-                time: '1752749587'
-                data:
-                  - name: 阿富汗
-                    code: AF
-                    id: 1670
-                  - name: 奥兰
-                    code: AX
-                    id: 1671
           headers: {}
           x-apifox-name: 成功
       security: []
