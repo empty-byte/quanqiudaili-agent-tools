@@ -28,6 +28,12 @@ describe('fillRenewDefaults', () => {
     expect(queries).toEqual(['?product_type_id=3&ids=77,76&page=1&pagesize=100&is_mcp_send=1']);
   });
 
+  it('ids 去空格、去重后再发', async () => {
+    const on: Setting = { is_renew: '1', renew_with_bandwidth: '0' };
+    const filled = await fillRenewDefaults({ ...args, sub_account_ids: ' 77, 76,77 ,' }, list, cfg, backend({ 77: on, 76: on }));
+    expect(filled.sub_account_ids).toBe('77,76');
+  });
+
   it('传了 renew_with_bandwidth 就用传的值', async () => {
     const off: Setting = { is_renew: '0', renew_with_bandwidth: '0' };
     expect(await fillRenewDefaults({ ...args, renew_with_bandwidth: 1 }, list, cfg, backend({ 77: off, 76: off })))
