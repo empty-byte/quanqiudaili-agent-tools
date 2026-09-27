@@ -45,7 +45,7 @@ paths:
                   type: string
                 renew_with_bandwidth:
                   type: integer
-                  description: 续费时是否包含带宽:0=不包含,1=包含
+                  description: 续费时是否包含带宽:0=不包含,1=包含。会同时写回子账号的自动续费带宽设置
                   example: 0
                 is_renew:
                   type: integer

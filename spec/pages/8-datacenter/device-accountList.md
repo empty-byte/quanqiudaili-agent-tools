@@ -63,14 +63,14 @@ paths:
             type: string
         - name: subAccountStart
           in: query
-          description: 子账号区间搜索[初始]
+          description: 子账号区间搜索[初始]。跨度不超过 5000
           required: false
           example: 100
           schema:
             type: integer
         - name: subAccountEnd
           in: query
-          description: 子账号区间搜索[结束]
+          description: 子账号区间搜索[结束]。跨度不超过 5000
           required: false
           example: 200
           schema:
