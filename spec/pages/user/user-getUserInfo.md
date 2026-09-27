@@ -43,8 +43,19 @@ paths:
                   data:
                     type: object
                     properties:
+                      realName:
+                        type: string
+                      nextLevel:
+                        type: integer
+                      nextLevelStartPoint:
+                        type: integer
+                      withdrawalAmount:
+                        type: number
+                      last3WithdrawalAmount:
+                        type: integer
                       id:
                         type: integer
+                        description: 用户id
                       username:
                         type: string
                         description: 用户名
@@ -57,125 +68,184 @@ paths:
                       mobile:
                         type: string
                         description: 手机号
-                      email_verify:
-                        type: integer
-                        description: 邮件是否验证。0=未验证，1=已验证
-                      mobile_verify:
-                        type: integer
-                        description: 手机号码是否验证。0=未验证，1=已验证
                       avatar:
                         type: string
                         description: 头像
-                      duties:
-                        type: 'null'
-                      gender:
-                        type: integer
-                      purpose:
-                        type: 'null'
                       money:
                         type: string
                         description: 账户余额
-                      score:
+                      mobile_verify:
                         type: integer
-                        description: 账户积分
-                      extension_status:
+                        description: 手机号码是否验证。0=未验证，1=已验证
+                      email_verify:
                         type: integer
-                        description: 推广状态：0=未激活，1=审核中，2=激活成功，3=激活失败
-                      verify_status:
+                        description: 邮件是否验证。0=未验证，1=已验证
+                      auth_verify:
+                        type: integer
+                        description: 是否实名。0=未实名。1=已实名
+                      user_group:
                         type: string
-                        description: 验证状态：0=未实名认证，1=已通过支付宝扫码实名认证
-                      owner_verify_status:
+                        description: 用户组。0=普通用户组，1=金牌代理商，2=银牌代理商
+                      fid:
+                        type: integer
+                        description: 父id
+                      ref_level1_user_id:
+                        type: integer
+                      ref_level2_user_id:
+                        type: integer
+                      valid_point:
+                        type: integer
+                        description: 有效积分
+                      history_total_point:
+                        type: integer
+                        description: 历史总积分
+                      promote_valid_date:
                         type: string
-                        description: 企业认证：0=未认证，1=已认证
+                        description: 推广有效期
+                      level:
+                        type: integer
                       ref:
                         type: string
                         description: 推广链接
-                      channel:
+                      agent_user_type:
                         type: string
-                        description: 推广方式：0=用户推广，1=渠道推广
-                      token:
+                      wechat_mp_openid:
                         type: string
-                        description: 登录token
+                      is_sms_notify_on:
+                        type: integer
+                      level2_agent_category:
+                        type: string
+                      level2_agent_add_verify:
+                        type: string
+                      password_type:
+                        type: integer
+                      isCustomerServiceSet:
+                        type: integer
+                      promotionCode:
+                        type: string
+                      unreadMessageCount:
+                        type: integer
+                      todoListCount:
+                        type: integer
                     required:
+                      - realName
+                      - nextLevel
+                      - nextLevelStartPoint
+                      - withdrawalAmount
+                      - last3WithdrawalAmount
                       - id
                       - username
                       - nickname
                       - email
                       - mobile
-                      - email_verify
-                      - mobile_verify
                       - avatar
-                      - duties
-                      - gender
-                      - purpose
                       - money
-                      - score
-                      - extension_status
-                      - verify_status
-                      - owner_verify_status
+                      - mobile_verify
+                      - email_verify
+                      - auth_verify
+                      - user_group
+                      - fid
+                      - ref_level1_user_id
+                      - ref_level2_user_id
+                      - valid_point
+                      - history_total_point
+                      - promote_valid_date
+                      - level
                       - ref
-                      - channel
-                      - token
+                      - agent_user_type
+                      - wechat_mp_openid
+                      - is_sms_notify_on
+                      - level2_agent_category
+                      - level2_agent_add_verify
+                      - password_type
+                      - isCustomerServiceSet
+                      - promotionCode
+                      - unreadMessageCount
+                      - todoListCount
                     x-apifox-orders:
+                      - realName
+                      - nextLevel
+                      - nextLevelStartPoint
+                      - withdrawalAmount
+                      - last3WithdrawalAmount
                       - id
                       - username
                       - nickname
                       - email
                       - mobile
-                      - email_verify
-                      - mobile_verify
                       - avatar
-                      - duties
-                      - gender
-                      - purpose
                       - money
-                      - score
-                      - extension_status
-                      - verify_status
-                      - owner_verify_status
+                      - mobile_verify
+                      - email_verify
+                      - auth_verify
+                      - user_group
+                      - fid
+                      - ref_level1_user_id
+                      - ref_level2_user_id
+                      - valid_point
+                      - history_total_point
+                      - promote_valid_date
+                      - level
                       - ref
-                      - channel
-                      - token
-                x-apifox-orders:
+                      - agent_user_type
+                      - wechat_mp_openid
+                      - is_sms_notify_on
+                      - level2_agent_category
+                      - level2_agent_add_verify
+                      - password_type
+                      - isCustomerServiceSet
+                      - promotionCode
+                      - unreadMessageCount
+                      - todoListCount
+                required:
                   - code
                   - msg
                   - time
                   - data
-                required:
+                x-apifox-orders:
                   - code
                   - msg
                   - time
                   - data
               example:
                 code: 1
-                msg: 获取成功
-                time: '1697528176'
+                msg: ok
+                time: '1790497115'
                 data:
-                  id: 1
-                  username: userxxxx
-                  nickname: demo_name
-                  email: demo_name@qq.com
-                  mobile: ''
+                  realName: xxx
+                  nextLevel: 2
+                  nextLevelStartPoint: 100001
+                  withdrawalAmount: 393.6
+                  last3WithdrawalAmount: 0
+                  id: 77
+                  username: xxx
+                  nickname: xxx
+                  email: xxx@xxx.com
+                  mobile: xxxxxx
+                  avatar: https://admin.quanqiudaili.com/xxxxxxxx
+                  money: '418.91'
+                  mobile_verify: 1
                   email_verify: 1
-                  mobile_verify: 0
-                  avatar: >-
-                    data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgaGVpZ2h0PSIxMDAiIHdpZHRoPSIxMDAiPjxyZWN0IGZpbGw9InJnYigxNjEsMTYwLDIyOSkiIHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48L3JlY3Q+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LXNpemU9IjUwIiB0ZXh0LWNvcHk9ImZhc3QiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHRleHQtcmlnaHRzPSJhZG1pbiIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjc8L3RleHQ+PC9zdmc+
-                  duties: null
-                  gender: 0
-                  purpose: null
-                  money: '3347.42'
-                  score: 2195
-                  extension_status: 2
-                  verify_status: '1'
-                  owner_verify_status: '0'
-                  ref: ''
-                  channel: '1'
-                  token: 3646c38e-82fd-4dc8-8815-b662229b83ac
-                  user_id: 1
-                  createtime: 1697512606
-                  expiretime: 1700104606
-                  expires_in: 2576430
-                  ref_status: 渠道推广
+                  auth_verify: 1
+                  user_group: '1'
+                  fid: 0
+                  ref_level1_user_id: 0
+                  ref_level2_user_id: 0
+                  valid_point: 331
+                  history_total_point: 331
+                  promote_valid_date: '2028-01-25 00:00:00'
+                  level: 1
+                  ref: xxxx
+                  agent_user_type: '1'
+                  wechat_mp_openid: xxxx-xxxx
+                  is_sms_notify_on: 0
+                  level2_agent_category: user
+                  level2_agent_add_verify: '0'
+                  password_type: 1
+                  isCustomerServiceSet: 1
+                  promotionCode: xxxxxx
+                  unreadMessageCount: 38
+                  todoListCount: 119
           headers: {}
           x-apifox-name: 成功
       security: []

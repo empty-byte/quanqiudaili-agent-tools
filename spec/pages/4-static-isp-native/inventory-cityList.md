@@ -74,23 +74,27 @@ paths:
                           type: integer
                         name:
                           type: string
-                          title: 名称
+                          description: 城市名称
                         code:
                           type: string
-                          title: code
+                          description: 城市code
                         country_id:
                           type: integer
+                        country_code:
+                          type: string
                       required:
                         - id
                         - name
                         - code
                         - country_id
+                        - country_code
                       x-apifox-orders:
                         - id
                         - name
                         - code
                         - country_id
-                    title: 城市列表
+                        - country_code
+                      description: 城市列表
                 required:
                   - code
                   - msg
@@ -104,60 +108,18 @@ paths:
               example:
                 code: 1
                 msg: 获取成功!
-                time: '1753173843'
+                time: '1790497050'
                 data:
-                  - id: 3902
-                    name: New York City
-                    code: New York City
-                    country_id: 653
-                  - id: 3905
-                    name: Chicago
-                    code: Chicago
-                    country_id: 653
-                  - id: 3906
-                    name: Seattle
-                    code: Seattle
-                    country_id: 653
-                  - id: 3909
-                    name: Dallas
-                    code: Dallas
-                    country_id: 653
-                  - id: 3910
-                    name: Houston
-                    code: Houston
-                    country_id: 653
-                  - id: 3911
+                  - id: 8757
                     name: Los Angeles
                     code: Los Angeles
-                    country_id: 653
-                  - id: 3912
-                    name: San Francisco
-                    code: San Francisco
-                    country_id: 653
-                  - id: 3913
-                    name: Las Vegas
-                    code: Las Vegas
-                    country_id: 653
-                  - id: 3914
-                    name: Phoenix
-                    code: Phoenix
-                    country_id: 653
-                  - id: 3915
-                    name: Washington
-                    code: Washington
-                    country_id: 653
-                  - id: 3916
-                    name: Boston
-                    code: Boston
-                    country_id: 653
-                  - id: 3917
-                    name: Philadelphia
-                    code: Philadelphia
-                    country_id: 653
-                  - id: 3950
-                    name: Columbia
-                    code: Columbia
-                    country_id: 653
+                    country_id: 1174
+                    country_code: US
+                  - id: 8761
+                    name: New York City
+                    code: New York City
+                    country_id: 1174
+                    country_code: US
           headers: {}
           x-apifox-name: 成功
       security: []

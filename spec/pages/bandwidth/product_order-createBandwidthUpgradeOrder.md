@@ -45,11 +45,14 @@ paths:
                     - '32'
                   type: array
                 bandwidth_num:
+                  type: integer
                   description: 要升级的带宽值，升级的带宽值要大于现在的带宽值
-                  example: '30'
-                  type: string
+                  example: 30
               required:
                 - product_type_id
+                - pay_method
+                - subAccountIds[]
+                - bandwidth_num
             examples: {}
       responses:
         '200':

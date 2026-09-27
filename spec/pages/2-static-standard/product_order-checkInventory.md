@@ -39,7 +39,7 @@ paths:
                   example: 15
                   type: integer
                 timelen:
-                  description: 时长计费类型：0=7天，1=30天，2=90天，3=180天，4=360天，5=3天
+                  description: 时长计费类型：0=7天，1=30天，2=90天，3=180天，4=360天
                   example: 0
                   type: integer
                 country:

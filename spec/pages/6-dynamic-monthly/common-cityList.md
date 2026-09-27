@@ -29,7 +29,7 @@ paths:
           description: >-
             国家编码，例如：US。从<a href='/api-222526763'
             target='_blank'>动态住宅（包月）国家列表</a>获取
-          required: false
+          required: true
           example: US
           schema:
             type: string

@@ -43,7 +43,8 @@ describe('spec/tools.json', () => {
 
     const ip = byName('order_buy_time_ip');
     expect(ip.inputSchema.properties.product_type_id.enum).toEqual([2, 3, 4, 8]);
-    expect([...ip.inputSchema.required].sort()).toEqual(['agree', 'country', 'num', 'product_type_id', 'timelen']);
+    expect([...ip.inputSchema.required].sort()).toEqual(['country', 'num', 'product_type_id', 'timelen']);
+    expect(ip.inputSchema.properties.agree).toBeUndefined();
     expect(ip.inputSchema.properties.appoint_ip).toMatchObject({
       type: 'array',
       items: { type: 'object', properties: { ip_str: { type: 'string' }, count: { type: 'integer' } } },

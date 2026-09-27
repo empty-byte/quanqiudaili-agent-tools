@@ -27,7 +27,7 @@ paths:
         - name: country_code
           in: query
           description: 国家编码，例如：US。从<a href='/api-222033933' target='_blank'>动态住宅国家列表</a>获取
-          required: false
+          required: true
           example: HK
           schema:
             type: string
@@ -88,6 +88,15 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1752746716'
+                data:
+                  - name: Tin Shui Wai
+                    code: Tin Shui Wai
+                    state_name: Yuen Long
+                    country_name: 中国香港
           headers: {}
           x-apifox-name: 成功
       security: []

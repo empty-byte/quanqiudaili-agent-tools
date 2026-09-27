@@ -73,7 +73,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "带宽监控列表",
   },
   {
-    "description": "查询时长类产品可购买的带宽套餐。",
+    "description": "查询时长类产品可购买的带宽档位与价格。price 是每 IP 每天、还没乘档位折扣的价格，month_price 是它的 30 倍；实际扣费以下单为准。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -156,13 +156,13 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "子账号带宽趋势",
   },
   {
-    "description": "计算为子账号升级带宽需要的费用，不下单、不扣费。下单请用 order_bandwidth_upgrade。",
+    "description": "计算为子账号升级带宽需要的费用，不下单、不扣费。下单请用 order_bandwidth_upgrade；试算不检查"所有子账号同一国家"和"单次最多 300 个"，下单时会检查。不属于本人或产品不符的子账号会被静默跳过。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "bandwidth_num": {
-          "description": "要升级的带宽值，升级的带宽值要大于现在的带宽值",
+          "description": "目标带宽，必须是 bandwidth_package_list 返回的某个档位的 num，且大于子账号当前及续费后尚未开始的各段带宽",
           "type": "integer",
         },
         "product_type_id": {
@@ -218,6 +218,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       },
       "required": [
         "product_type_id",
+        "country_code",
       ],
       "type": "object",
     },
@@ -274,6 +275,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       },
       "required": [
         "product_type_id",
+        "country_code",
       ],
       "type": "object",
     },
@@ -284,7 +286,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "动态产品州/省列表",
   },
   {
-    "description": "会从账户余额扣费。为时长类子账号升级带宽，先用 bandwidth_upgrade_price 试算并向用户确认。",
+    "description": "会从账户余额扣费。为时长类子账号升级带宽，立即生效。所有子账号必须属于同一国家，单次最多 300 个，已过期的不能升级；失败时后端只返回笼统的"带宽升级订单创建失败"，所以先用 bandwidth_upgrade_price 试算并向用户确认。",
     "destructive": true,
     "fixed": {
       "pay_method": "balance",
@@ -293,7 +295,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "additionalProperties": false,
       "properties": {
         "bandwidth_num": {
-          "description": "要升级的带宽值，升级的带宽值要大于现在的带宽值",
+          "description": "目标带宽，必须是 bandwidth_package_list 返回的某个档位的 num，且大于子账号当前带宽",
           "type": "integer",
         },
         "product_type_id": {
@@ -329,7 +331,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "带宽升级下单",
   },
   {
-    "description": "会从账户余额扣费。购买动态住宅流量，num 为 GB 数（1-300，要买更多请分几次下单）：产品 1 不限时长；产品 6 为包月，num 是每月的 GB 数，bill_timelen 指定有效时长档位。下单前先用 product_unit_price 查价、user_info 查余额，并向用户确认。",
+    "description": "会从账户余额扣费。购买动态住宅流量，num 为 GB 数（1-300，要买更多请分几次下单）：产品 1 不限时长；产品 6 为包月，一次性加 num GB，有效期由 bill_timelen 决定，到期没用完的流量会被扣掉。下单前先用 product_unit_price 查价、user_balance 查余额，并向用户确认。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
@@ -369,22 +371,13 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "购买动态住宅流量",
   },
   {
-    "description": "会从账户余额按时长扣费。购买短期测试用的时长 IP，用于自有平台给用户试用；只有代理商账号能调用，普通账号会被拒绝。",
+    "description": "会从账户余额扣费，金额是账号等级的测试单价 × 数量，另加带宽费，和时长无关。购买短期测试用的时长 IP，子账号建在调用者自己名下；只有已实名的代理商账号能调用，普通账号会被拒绝。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
-        "agree": {
-          "description": "协议，大写",
-          "enum": [
-            "SOCKS5",
-            "HTTP",
-            "HTTPS",
-          ],
-          "type": "string",
-        },
         "bandwidth_num": {
-          "description": "带宽，单位 Mbps，不传默认 5；10 和 15 是否可选取决于账号等级配置",
+          "description": "带宽，单位 Mbps，不传默认 5。标准测试（timelen=12）只能选 5；10 和 15 只在特殊测试时长、且账号等级配了价格时可用",
           "enum": [
             5,
             10,
@@ -397,7 +390,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "country": {
-          "description": "国家编码，用 static_country_list 查。国家用 ISO 3166-1 二字码，如 US",
+          "description": "国家编码，必须大写，用 static_country_list 查。国家用 ISO 3166-1 二字码，如 US",
           "type": "string",
         },
         "num": {
@@ -415,7 +408,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "timelen": {
-          "description": "测试时长，单位小时；普通账号固定传 12",
+          "description": "测试时长档位，单位小时。传 12 表示标准测试，实际开通时长按账号等级配置（不一定是 12 小时）；账号有特殊测试配置时，可传配置里的小时数",
           "type": "integer",
         },
       },
@@ -423,7 +416,6 @@ exports[`spec/tools.json > 完整快照 1`] = `
         "product_type_id",
         "num",
         "timelen",
-        "agree",
         "country",
       ],
       "type": "object",
@@ -440,22 +432,13 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
-        "agree": {
-          "description": "协议，大写",
-          "enum": [
-            "SOCKS5",
-            "HTTP",
-            "HTTPS",
-          ],
-          "type": "string",
-        },
         "appoint_ip": {
           "description": "指定从哪些 IP 段购买，每项写一个 IP 段和该段要买的数量，所有 count 之和必须等于 num；不传则由系统随机分配。IP 段用 static_ip_range_list 查",
           "items": {
             "additionalProperties": false,
             "properties": {
               "count": {
-                "description": "该段要买的 IP 数量，不能超过列表里该段的 num",
+                "description": "该段要买的 IP 数量",
                 "type": "integer",
               },
               "ip_str": {
@@ -533,7 +516,6 @@ exports[`spec/tools.json > 完整快照 1`] = `
         "product_type_id",
         "num",
         "timelen",
-        "agree",
         "country",
       ],
       "type": "object",
@@ -545,7 +527,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "购买时长 IP",
   },
   {
-    "description": "为某个订单下的时长类子账号申请退单；不同订单的子账号请分别调用。只能退下单 1 天内、已支付、未开发票、未申请过退单的购买订单，续费订单和赠送订单不能退。",
+    "description": "为某个购买订单下的时长类子账号申请退单；不同订单的子账号请分别调用。只能退下单 1 天内、已支付、未开发票的购买订单，续费、赠送、带宽升级等订单都不能退；子账号有续费记录或带宽升级订单时不能退，申请过的子账号不能重复申请；单次可退数量有上限（默认 30 个）。提交后由上级代理商或平台审核，审核通过后这些子账号会被删除。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -581,7 +563,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "申请退单",
   },
   {
-    "description": "会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。数据中心不能续 7 天。不会改动子账号的自动续费开关；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。",
+    "description": "会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。数据中心不能续 7 天。不会改动子账号的自动续费开关，但会把本次续费时长写成子账号以后自动续费的时长；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。",
     "destructive": true,
     "inputSchema": {
       "additionalProperties": false,
@@ -597,7 +579,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "renew_with_bandwidth": {
-          "description": "续费时是否包含带宽：0=不包含，1=包含。不传则沿用子账号当前的自动续费带宽设置；传了会同时改掉该设置",
+          "description": "续费时是否包含带宽：1=按当前带宽续；0=不包含，续费期带宽按 5M 计价，当前带宽周期结束后回落到 5M。不传则沿用子账号当前的自动续费带宽设置；传了会同时改掉该设置",
           "enum": [
             0,
             1,
@@ -649,7 +631,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "产品信息",
   },
   {
-    "description": "查询当前账号各产品的单价、折扣和按国家的自定义价。data 按产品 ID 分组；时长类产品按 7/30/90/180/360 天档位返回 originUnitPrice、userUnitPrice、percent。",
+    "description": "查询当前账号各产品的单价和按国家的自定义价。data 按产品 ID 分组：产品 1 单档；产品 6 按 30/90/180 天三档；时长类产品按 7/30/90/180/360 天档位。每档返回 originUnitPrice（平台原价）、userUnitPrice（用户单价）、isCustom（是否设置了自定义价）；customPriceBalance 是自定义价额度。data 里还会出现产品 7（动态次数），可忽略。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -664,17 +646,17 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "产品单价",
   },
   {
-    "description": "查询时长类产品某国家下可购买的城市。",
+    "description": "查询时长类产品可选的城市，可按国家筛选；country_id 和 country_code 都不传时返回该产品全部城市，两个都传时必须是同一个国家。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "country_code": {
-          "description": "国家编码，用 static_country_list 查；和 country_id 二选一。国家用 ISO 3166-1 二字码，如 US",
+          "description": "国家编码，用 static_country_list 查。国家用 ISO 3166-1 二字码，如 US",
           "type": "string",
         },
         "country_id": {
-          "description": "国家 id，用 static_country_list 查；和 country_code 二选一",
+          "description": "国家 id，取 static_country_list 返回的 id（每个产品一套 id，不能用 static_region_stock 返回的 country_id）",
           "type": "string",
         },
         "product_type_id": {
@@ -734,7 +716,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "additionalProperties": false,
       "properties": {
         "city_code": {
-          "description": "城市编码，取 static_city_list 返回的 code 字段",
+          "description": "城市编码，取 static_city_list 返回的 code 字段；只有同时传 country_code 时才生效",
           "type": "string",
         },
         "country_code": {
@@ -746,7 +728,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "ip_str": {
-          "description": "IP 段前缀，只能写前 1 到 2 段，如 104 或 104.223",
+          "description": "IP 段前缀，只能写前 1 到 2 段，如 104 或 104.223；按字符串前缀匹配，104.2 也会匹配 104.20 到 104.29 和 104.200 到 104.255",
           "type": "string",
         },
         "page": {
@@ -780,7 +762,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "时长产品 IP 段列表",
   },
   {
-    "description": "查询时长类产品某国家各地区的库存详情。",
+    "description": "查询时长类产品某国家各地区的库存状态，只给充足或紧缺标签，不给具体数量；结果包含本账号可复用的 IP。数据中心（8）固定返回紧缺，不反映真实库存。返回的 country_id、city_id 属于全球地区库，不能拿去调 static_city_list。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -813,18 +795,18 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "时长产品地区库存",
   },
   {
-    "description": "购买时长 IP 前检测库存是否满足，不下单、不扣费。参数与 order_buy_time_ip 基本相同，但没有 agree（协议不影响库存）。",
+    "description": "购买时长 IP 前检测库存是否满足，不下单、不扣费。只统计本地库存池，结果充足也可能在下单时售罄；数据中心（8）选美国以外的国家时恒返回充足。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
         "appoint_ip": {
-          "description": "指定从哪些 IP 段购买，每项写一个 IP 段和该段要买的数量，所有 count 之和必须等于 num；不传则由系统随机分配。IP 段用 static_ip_range_list 查",
+          "description": "指定检测哪些 IP 段，每项写一个 IP 段和该段要的数量，所有 count 之和必须等于 num。IP 段用 static_ip_range_list 查",
           "items": {
             "additionalProperties": false,
             "properties": {
               "count": {
-                "description": "该段要买的 IP 数量，不能超过列表里该段的 num",
+                "description": "该段要的 IP 数量",
                 "type": "integer",
               },
               "ip_str": {
@@ -836,12 +818,8 @@ exports[`spec/tools.json > 完整快照 1`] = `
           },
           "type": "array",
         },
-        "bandwidth_num": {
-          "description": "带宽加购，单位 Mbps，不传默认 5；可选档位和价格用 bandwidth_package_list 按产品和国家查，填返回的 num；数据中心（8）没有带宽加购，不要传",
-          "type": "integer",
-        },
         "city": {
-          "description": "城市名称，取 static_city_list 返回的 name 字段；不传则随机",
+          "description": "城市名称，取 static_city_list 返回的 name 字段；不传则按全国统计",
           "type": "string",
         },
         "country": {
@@ -866,34 +844,14 @@ exports[`spec/tools.json > 完整快照 1`] = `
           ],
           "type": "integer",
         },
-        "random_account_password": {
-          "description": "是否生成随机账号密码:0=否,1=是(默认为0)",
-          "enum": [
-            0,
-            1,
-          ],
-          "type": "integer",
-        },
-        "remark": {
-          "description": "创建的子账号备注",
-          "type": "string",
-        },
         "timelen": {
-          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不卖 7 天，不能选 0",
+          "description": "购买时长：0=7天，1=30天，2=90天，3=180天，4=360天；不影响检测结果",
           "enum": [
             0,
             1,
             2,
             3,
             4,
-          ],
-          "type": "integer",
-        },
-        "use_ip_port": {
-          "description": "是否开启ip端口连接:0=不开启,1=开启(默认为0)",
-          "enum": [
-            0,
-            1,
           ],
           "type": "integer",
         },
@@ -918,7 +876,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
       "additionalProperties": false,
       "properties": {
         "agree": {
-          "description": "协议，大写。产品 6 下必填",
+          "description": "协议，大写；不传默认 SOCKS5",
           "enum": [
             "SOCKS5",
             "HTTP",
@@ -931,7 +889,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "country": {
-          "description": "国家编码，用 dynamic_country_list 查。国家用 ISO 3166-1 二字码，如 US",
+          "description": "国家编码，用 dynamic_country_list 查；不传或传 ALL 为全球。国家用 ISO 3166-1 二字码，如 US",
           "type": "string",
         },
         "limit_flow": {
@@ -967,7 +925,6 @@ exports[`spec/tools.json > 完整快照 1`] = `
         "product_type_id",
         "num",
         "changeInterval",
-        "country",
       ],
       "type": "object",
     },
@@ -1040,7 +997,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "批量删除子账号",
   },
   {
-    "description": "查询动态住宅流量子账号某个月的流量消耗。仅支持按月查询；同一账号 1 分钟内最多查询 30 个不同子账号。",
+    "description": "查询动态住宅流量子账号某个月每天的流量消耗。rows 每项是一天，flow 单位是 MB（不是 GB）；total 是返回的天数。结果缓存 5 分钟；同一账号 1 分钟内最多查询 30 个不同子账号。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1076,7 +1033,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "动态子账号月度流量",
   },
   {
-    "description": "查询动态子账号的流量上限设置与已用量。",
+    "description": "查询动态子账号的流量上限设置。use_flow 是定时任务记录的已用量快照，单位字节，不是实时值，没设上限的子账号为 0；要查真实用量用 sub_account_flow_query。没设置过上限时各字段返回 0。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1107,7 +1064,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "子账号流量上限",
   },
   {
-    "description": "分页查询子账号，覆盖全部产品类型；返回用户名、密码、端口、协议、国家、流量等。",
+    "description": "分页查询子账号，覆盖全部产品类型；返回用户名、密码、端口、协议、国家、流量等。按 searchArr 批量搜索时，一条都没命中会返回不带筛选的全部子账号而不是空列表，要核对返回的是不是要找的子账号。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1165,18 +1122,6 @@ exports[`spec/tools.json > 完整快照 1`] = `
           ],
           "type": "integer",
         },
-        "subAccountEnd": {
-          "description": "子账号 id 区间终点，与 subAccountStart 一起用",
-          "type": "integer",
-        },
-        "subAccountName": {
-          "description": "自定义用户名",
-          "type": "string",
-        },
-        "subAccountStart": {
-          "description": "子账号 id 区间起点，与 subAccountEnd 一起用，跨度不超过 5000",
-          "type": "integer",
-        },
       },
       "required": [
         "product_type_id",
@@ -1192,7 +1137,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "子账号列表",
   },
   {
-    "description": "批量给子账号设置自定义用户名和密码，只能用字母和数字，长度 8-30 位。",
+    "description": "批量给子账号设置自定义用户名和密码，只能用字母和数字，长度 8-30 位；用户名在全平台唯一，重复会报错。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1250,7 +1195,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "自定义子账号账密",
   },
   {
-    "description": "为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。新上限低于已用量时，该子账号会立即停用并断开正在使用的连接。",
+    "description": "为动态子账号设置流量上限；limit_flow 为 0 表示取消限制。新上限低于已用量时，该子账号会立即停用并断开正在使用的连接；调高上限（不低于已用量）或设为 0 会解除停用。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1272,12 +1217,11 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "timelen": {
-          "description": "周期：0 天、1 周、2 月、3 季度、4 年；type=1 时必填，type=0 时忽略",
+          "description": "周期：0 天、1 周、2 月、4 年；type=1 时应传，不传按天；type=0 时忽略",
           "enum": [
             0,
             1,
             2,
-            3,
             4,
           ],
           "type": "integer",
@@ -1305,7 +1249,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "设置子账号流量上限",
   },
   {
-    "description": "批量开启或关闭静态住宅（2/3/4）子账号的 IP 端口直连，ids 为逗号分隔的子账号 id。",
+    "description": "批量开启或关闭静态住宅（2/3/4）子账号的 IP 端口直连，ids 为逗号分隔的子账号 id，单次最多 200 个，不能重复，且都要属于这个产品；直连端口固定为 5001。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1364,13 +1308,14 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "remark": {
-          "description": "备注",
+          "description": "新备注，传空串会清空备注",
           "type": "string",
         },
       },
       "required": [
         "product_type_id",
         "id",
+        "remark",
       ],
       "type": "object",
     },
@@ -1381,7 +1326,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "修改子账号备注",
   },
   {
-    "description": "批量修改多个子账号的备注，ids 为逗号分隔的子账号 id。",
+    "description": "批量修改多个子账号的备注，ids 为逗号分隔的子账号 id，单次最多 200 个（超过会失败）。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
