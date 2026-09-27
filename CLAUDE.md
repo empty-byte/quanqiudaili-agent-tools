@@ -41,7 +41,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 所有查询接口用 `request->param()` 取参，GET 和 POST 都收，所以"查询一律 GET"是安全的。
 - `product_type_id`：1 动态住宅流量不限时长、6 动态住宅流量包月、2 静态住宅普通、3 静态住宅原生、4 静态住宅运营商原生、8 数据中心。
 - `createBandwidthUpgradeOrder` 的 `pay_method` 固定 `balance`，用 overrides 的 `fixed` 加 `drop` 实现。
-- `createRenewProductBuyOrder` 接受文档没写的 `is_renew`（0/1，不传当 0），并把 `is_renew`、`renew_with_bandwidth`、`renew_timelen` 写回子账号的自动续费设置（`ProductPackage.php` 续费流程），照文档直接调一次就会把用户开着的自动续费关掉。
+- `createRenewProductBuyOrder` 的 `is_renew`（0/1）不传当 0，并把 `is_renew`、`renew_with_bandwidth`、`renew_timelen` 写回子账号的自动续费设置（`ProductPackage.php` 续费流程），照文档直接调一次就会把用户开着的自动续费关掉。文档 2026-09-27 起写了这个参数，overrides 用 `drop` 把它挡在工具外，由 `src/renew.ts` 沿用当前值。
+- `createProductBuyOrder` 的 `num` 对全部产品都是 1-300（动态按 GB），数据中心单次最多 50。业务上数据中心禁止购买、续费 7 天，但后端校验 `timelen` 对全部产品放行 0，MCP 目前只在描述里提示。
 - 子账号 id 类参数一律 string（数组元素也是），`test/spec.test.ts` 有断言；`subAccountStart`/`subAccountEnd` 与 `order_product_buy_id` 保持 integer。
 
 ## 规则
