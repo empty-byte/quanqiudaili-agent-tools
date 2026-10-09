@@ -84,7 +84,7 @@ paths:
             type: string
         - name: token
           in: header
-          description: ''
+          description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
           required: false
           example: '{{access_token}}'
           schema:
@@ -142,6 +142,18 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功
+                time: '1752746322'
+                data:
+                  total: 0
+                  rows: []
+                  base:
+                    totalFlow: '1.00'
+                    useFlow: '0.00'
+                    baseFlow: '1.00'
+                    expiresIn: '2024-06-28 10:06:23'
           headers: {}
           x-apifox-name: 成功
       security: []

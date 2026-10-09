@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { generate, loadPages } from '../scripts/build-spec.js';
 import { placePages } from '../scripts/lib/merge.js';
@@ -11,17 +11,19 @@ const byName = (n: string) => {
 };
 
 describe('spec/tools.json', () => {
-  it('恰好 34 个工具，20 个只读，名字与设计文档一致', () => {
+  it('恰好 38 个工具，20 个只读，名字与设计文档一致', () => {
     expect(tools.map(t => t.name)).toEqual([
       'bandwidth_detail', 'bandwidth_monitoring_list', 'bandwidth_package_list', 'bandwidth_trend', 'bandwidth_upgrade_price',
       'dynamic_city_list', 'dynamic_country_list', 'dynamic_state_list',
-      'order_bandwidth_upgrade', 'order_buy_dynamic', 'order_buy_test_ip', 'order_buy_time_ip', 'order_refund_apply', 'order_renew',
+      'order_bandwidth_upgrade', 'order_buy_dynamic', 'order_buy_dynamic_bandwidth', 'order_buy_test_ip', 'order_buy_time_ip',
+      'order_refund_apply', 'order_refund_dynamic_bandwidth', 'order_renew', 'order_renew_dynamic_bandwidth', 'order_upgrade_dynamic_bandwidth',
       'product_list', 'product_unit_price',
       'static_city_list', 'static_country_list', 'static_ip_range_list', 'static_region_stock', 'stock_check',
       'sub_account_add', 'sub_account_delete', 'sub_account_delete_batch', 'sub_account_flow_query', 'sub_account_limit_flow',
       'sub_account_list', 'sub_account_set_credentials', 'sub_account_set_limit_flow', 'sub_account_toggle_direct',
       'sub_account_update', 'sub_account_update_batch', 'user_balance', 'user_info',
     ]);
+    expect(tools).toHaveLength(38);
     expect(tools.filter(t => t.readOnly)).toHaveLength(20);
     for (const t of tools) expect(t.inputSchema.additionalProperties, t.name).toBe(false);
   });
@@ -29,13 +31,14 @@ describe('spec/tools.json', () => {
   it('只读 GET、其余 POST；删除与扣费带 destructive', () => {
     for (const t of tools) expect(t.method, t.name).toBe(t.readOnly ? 'GET' : 'POST');
     expect(tools.filter(t => t.destructive).map(t => t.name).sort()).toEqual([
-      'order_bandwidth_upgrade', 'order_buy_dynamic', 'order_buy_test_ip', 'order_buy_time_ip', 'order_renew',
+      'order_bandwidth_upgrade', 'order_buy_dynamic', 'order_buy_dynamic_bandwidth', 'order_buy_test_ip', 'order_buy_time_ip',
+      'order_refund_dynamic_bandwidth', 'order_renew', 'order_renew_dynamic_bandwidth', 'order_upgrade_dynamic_bandwidth',
       'sub_account_delete', 'sub_account_delete_batch',
     ]);
-    for (const t of tools.filter(x => x.destructive)) expect(t.description, t.name).toMatch(/^(会从账户余额|不可恢复)/);
+    for (const t of tools.filter(x => x.destructive)) expect(t.description, t.name).toMatch(/^(会从账户余额|不可恢复|审核通过后会删除并终止子账号，不可恢复。)/);
   });
 
-  it('购买接口按产品拆成两个工具', () => {
+  it('购买接口按产品拆成三个工具，旧流量与时长产品保留原契约', () => {
     const dyn = byName('order_buy_dynamic');
     expect(dyn.inputSchema.properties.product_type_id.enum).toEqual([1, 6]);
     expect(Object.keys(dyn.inputSchema.properties).sort()).toEqual(['bill_timelen', 'num', 'product_type_id']);
@@ -50,6 +53,45 @@ describe('spec/tools.json', () => {
       items: { type: 'object', properties: { ip_str: { type: 'string' }, count: { type: 'integer' } } },
     });
     expect(ip.inputSchema.properties.country.description).toMatch(/ISO 3166-1/);
+
+    const bandwidth = byName('order_buy_dynamic_bandwidth');
+    expect(bandwidth.path).toBe('/externalapi/product_order/createProductBuyOrder');
+    expect(Object.keys(bandwidth.inputSchema.properties).sort()).toEqual(['bandwidth_num', 'bill_timelen', 'country', 'product_type_id', 'remark']);
+    expect([...bandwidth.inputSchema.required].sort()).toEqual(['bandwidth_num', 'bill_timelen', 'country', 'product_type_id']);
+    expect(bandwidth.inputSchema.properties).toMatchObject({
+      product_type_id: { type: 'integer', enum: [11] },
+      bill_timelen: { type: 'integer', enum: [1, 2, 3] },
+      country: { type: 'string', enum: ['us', 'sg', 'eu'] },
+      bandwidth_num: { type: 'integer' },
+      remark: { type: 'string' },
+    });
+  });
+
+  it('动态带宽续费与升级使用本地 sub_account_id，并保留各自参数契约', () => {
+    const renew = byName('order_renew_dynamic_bandwidth');
+    expect(renew.path).toBe('/externalapi/product_order/createBandwidthRenewOrder');
+    expect(Object.keys(renew.inputSchema.properties).sort()).toEqual(['bill_timelen', 'sub_account_id', 'user_conpon_id']);
+    expect([...renew.inputSchema.required].sort()).toEqual(['bill_timelen', 'sub_account_id']);
+    expect(renew.inputSchema.properties).toMatchObject({
+      sub_account_id: { type: 'string' },
+      bill_timelen: { type: 'integer', enum: [1, 2, 3] },
+      user_conpon_id: { type: 'string' },
+    });
+
+    const upgrade = byName('order_upgrade_dynamic_bandwidth');
+    expect(upgrade.path).toBe('/externalapi/product_order/createBandwidthUpgradeOrderForDrfbw');
+    expect(Object.keys(upgrade.inputSchema.properties).sort()).toEqual(['bandwidth_num', 'sub_account_id']);
+    expect([...upgrade.inputSchema.required].sort()).toEqual(['bandwidth_num', 'sub_account_id']);
+    expect(upgrade.inputSchema.properties).toMatchObject({ sub_account_id: { type: 'string' }, bandwidth_num: { type: 'integer' } });
+  });
+
+  it('动态带宽退单按订单申请，旧静态退单仍要求 ids', () => {
+    const refund = byName('order_refund_dynamic_bandwidth');
+    expect(refund.path).toBe('/externalapi/order_back/createOrderBack');
+    expect(Object.keys(refund.inputSchema.properties).sort()).toEqual(['order_product_buy_id', 'remark']);
+    expect([...refund.inputSchema.required].sort()).toEqual(['order_product_buy_id', 'remark']);
+    expect(refund.inputSchema.properties).toMatchObject({ order_product_buy_id: { type: 'integer' }, remark: { type: 'string' } });
+    expect(byName('order_refund_apply').inputSchema.required).toContain('ids');
   });
 
   it('括号参数转成结构化参数', () => {
@@ -68,7 +110,7 @@ describe('spec/tools.json', () => {
 
   it('子账号列表覆盖全部产品，pagesize 注明上限', () => {
     const list = byName('sub_account_list');
-    expect(list.inputSchema.properties.product_type_id.enum).toEqual([1, 2, 3, 4, 6, 8]);
+    expect(list.inputSchema.properties.product_type_id.enum).toEqual([1, 2, 3, 4, 6, 8, 11]);
     expect(list.inputSchema.required).toEqual(['product_type_id', 'page', 'pagesize']);
     expect(list.inputSchema.properties.pagesize.description).toMatch(/100/);
   });
@@ -108,9 +150,19 @@ describe('spec/tools.json', () => {
     expect(JSON.parse(readFileSync(new URL('../spec/tools.json', import.meta.url), 'utf8'))).toEqual(tools);
   });
 
+  it('产品 11 目录收录列表、购买、续费、升级与退单五页', () => {
+    expect(readdirSync(new URL('../spec/pages/11-dynamic-bandwidth', import.meta.url)).sort()).toEqual([
+      'device-accountList.md',
+      'order_back-createOrderBack.md',
+      'product_order-createBandwidthRenewOrder.md',
+      'product_order-createBandwidthUpgradeOrderForDrfbw.md',
+      'product_order-createProductBuyOrder.md',
+    ]);
+  });
+
   it('spec/pages 的目录与文件名符合 placePages 规则（sync-docs 按同一规则落盘，不要手动改名）', () => {
     const pages = loadPages();
-    expect(pages).toHaveLength(80);
+    expect(pages).toHaveLength(85);
     for (const [file, p] of placePages(pages)) expect(file, p.id).toBe(`${p.id}.md`);
   });
 

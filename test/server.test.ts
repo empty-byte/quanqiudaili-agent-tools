@@ -57,12 +57,17 @@ async function connect(args: string[], opts: ConnectOptions = {}): Promise<Clien
 const textOf = (r: { content?: unknown }) => ((r.content as { text: string }[])[0]).text;
 
 describe('stdio server', () => {
-  it('不带参数暴露全部 34 个工具，扣费与删除工具带 destructiveHint', async () => {
+  it('不带参数暴露全部 38 个工具，扣费与删除工具带 destructiveHint', async () => {
     const c = await connect([]);
     const { tools } = await c.listTools();
-    expect(tools).toHaveLength(34);
+    expect(tools).toHaveLength(38);
     const buy = tools.find(t => t.name === 'order_buy_time_ip');
     expect(buy?.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+    for (const name of ['order_buy_dynamic_bandwidth', 'order_renew_dynamic_bandwidth', 'order_upgrade_dynamic_bandwidth', 'order_refund_dynamic_bandwidth']) {
+      const tool = tools.find(t => t.name === name);
+      expect(tool?.annotations, name).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+      expect(tool?.inputSchema.properties, name).toHaveProperty('confirm_token');
+    }
     await c.close();
   }, 20_000);
 
@@ -72,6 +77,12 @@ describe('stdio server', () => {
     expect(tools).toHaveLength(20);
     expect(tools.every(t => t.annotations?.readOnlyHint === true)).toBe(true);
     expect(tools.find(t => t.name === 'sub_account_list')?.inputSchema.required).toEqual(['product_type_id', 'page', 'pagesize']);
+    expect(tools.filter(t => ['order_buy_dynamic_bandwidth', 'order_renew_dynamic_bandwidth', 'order_upgrade_dynamic_bandwidth', 'order_refund_dynamic_bandwidth'].includes(t.name))).toHaveLength(0);
+    hits.length = 0;
+    const list = await c.callTool({ name: 'sub_account_list', arguments: { product_type_id: 11, page: 1, pagesize: 10, ids: 'go-1951' } });
+    expect(list.isError).toBeFalsy();
+    expect(hits).toHaveLength(1);
+    expect(hits[0]).toMatchObject({ method: 'GET', url: '/externalapi/device/accountList?product_type_id=11&page=1&pagesize=10&ids=go-1951&is_mcp_send=1' });
 
     const { resources } = await c.listResources();
     expect(resources.map(r => r.uri)).toEqual(['quanqiudaili://docs/dynamic-proxy-session']);
@@ -133,6 +144,24 @@ describe('stdio server', () => {
     await c.close();
   }, 20_000);
 
+  it.each([
+    { name: 'order_buy_dynamic_bandwidth', arguments: { product_type_id: 11, bill_timelen: 1, country: 'US', bandwidth_num: 10 }, error: /allowed values/ },
+    { name: 'order_renew_dynamic_bandwidth', arguments: { sub_account_id: '1951', bill_timelen: 0 }, error: /allowed values/ },
+    { name: 'order_renew_dynamic_bandwidth', arguments: { sub_account_id: 1951, bill_timelen: 1 }, error: /must be string/ },
+    { name: 'order_upgrade_dynamic_bandwidth', arguments: { sub_account_id: 1951, bandwidth_num: 20 }, error: /must be string/ },
+  ])('动态带宽 $name 的非法参数被 SDK 拦截，不请求后端', async ({ name, arguments: args, error }) => {
+    const c = await connect(['--yes']);
+    try {
+      hits.length = 0;
+      const r = await c.callTool({ name, arguments: args });
+      expect(r.isError).toBe(true);
+      expect(textOf(r)).toMatch(error);
+      expect(hits).toHaveLength(0);
+    } finally {
+      await c.close();
+    }
+  }, 20_000);
+
   it('setup 子命令打印各客户端的配置片段并以 0 退出，不需要 token 环境变量', () => {
     const r = spawnSync(process.execPath, [ENTRY, 'setup', '--token', 'abc'], { encoding: 'utf8', env: { ...process.env, QQDL_TOKEN: '' } });
     expect(r.status).toBe(0);
@@ -156,6 +185,53 @@ describe('stdio server', () => {
 describe('写操作确认', () => {
   const WRITE = { name: 'sub_account_update_batch', arguments: { product_type_id: 1, ids: '12,13', remark: '测试' } };
   const LIST = { name: 'sub_account_list', arguments: { product_type_id: 1, page: 1, pagesize: 10 } };
+
+  it.each([
+    {
+      name: 'order_buy_dynamic_bandwidth',
+      arguments: { product_type_id: 11, bill_timelen: 1, country: 'us', bandwidth_num: 10, remark: 'test' },
+      path: '/externalapi/product_order/createProductBuyOrder',
+      body: 'product_type_id=11&bill_timelen=1&country=us&bandwidth_num=10&remark=test&is_mcp_send=1',
+    },
+    {
+      name: 'order_renew_dynamic_bandwidth',
+      arguments: { sub_account_id: '1951', bill_timelen: 2, user_conpon_id: '7' },
+      path: '/externalapi/product_order/createBandwidthRenewOrder',
+      body: 'sub_account_id=1951&bill_timelen=2&user_conpon_id=7&is_mcp_send=1',
+    },
+    {
+      name: 'order_upgrade_dynamic_bandwidth',
+      arguments: { sub_account_id: '1951', bandwidth_num: 20 },
+      path: '/externalapi/product_order/createBandwidthUpgradeOrderForDrfbw',
+      body: 'sub_account_id=1951&bandwidth_num=20&is_mcp_send=1',
+    },
+    {
+      name: 'order_refund_dynamic_bandwidth',
+      arguments: { order_product_buy_id: 99, remark: 'test' },
+      path: '/externalapi/order_back/createOrderBack',
+      body: 'order_product_buy_id=99&remark=test&is_mcp_send=1',
+    },
+  ])('动态带宽 $name 先返回确认码，确认后只发一次 POST', async ({ name, arguments: args, path, body }) => {
+    const c = await connect([]);
+    try {
+      hits.length = 0;
+      const first = await c.callTool({ name, arguments: args });
+      expect(first.isError).toBeFalsy();
+      expect(textOf(first)).toContain('待确认');
+      expect(textOf(first)).toContain(name);
+      const token = textOf(first).match(/confirm_token=([0-9a-f]+)/)?.[1];
+      expect(token).toBeTruthy();
+      expect(hits).toHaveLength(0);
+
+      const done = await c.callTool({ name, arguments: { ...args, confirm_token: token } });
+      expect(done.isError).toBeFalsy();
+      expect(JSON.parse(textOf(done))).toMatchObject({ code: 1 });
+      expect(hits).toHaveLength(1);
+      expect(hits[0]).toMatchObject({ method: 'POST', url: path, body, token: 'test-token' });
+    } finally {
+      await c.close();
+    }
+  }, 20_000);
 
   it('客户端支持弹窗确认：弹窗文案含工具名与参数，用户同意后才请求后端', async () => {
     const messages: string[] = [];

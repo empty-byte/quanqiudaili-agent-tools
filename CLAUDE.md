@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目是什么
 
-全球代理（quanqiudaili.com）对外 HTTP 接口 `externalapi` 的 MCP 服务器。TypeScript，官方 MCP SDK v2（`@modelcontextprotocol/server` 2.x），仅 stdio。不带参数暴露全部 34 个工具（含下单扣费与删除），`--readonly` 只暴露 20 个只读工具，旧参数 `query`/`manage` 仍接受；14 个写操作工具执行前先向用户确认（`src/confirm.ts`），`--yes` 关闭确认；`setup` 子命令打印各客户端的配置片段，不写文件。参数业务校验、鉴权、扣费都在 PHP 后端，本项目只是 HTTP 客户端，不改后端。面向其他使用者，环境要求与命令示例不以某台开发机为准。
+全球代理（quanqiudaili.com）对外 HTTP 接口 `externalapi` 的 MCP 服务器。TypeScript，官方 MCP SDK v2（`@modelcontextprotocol/server` 2.x），仅 stdio。不带参数暴露全部 38 个工具（含下单扣费与删除），`--readonly` 只暴露 20 个只读工具，旧参数 `query`/`manage` 仍接受；18 个写操作工具执行前先向用户确认（`src/confirm.ts`），`--yes` 关闭确认；`setup` 子命令打印各客户端的配置片段，不写文件。参数业务校验、鉴权、扣费都在 PHP 后端，本项目只是 HTTP 客户端，不改后端。面向其他使用者，环境要求与命令示例不以某台开发机为准。
 
 ## 常用命令
 
@@ -21,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 架构：两条链路
 
-开发期（生成链路）：文档站 `llms.txt` → `scripts/sync-docs.ts` 下载 81 个接口页（每页一个 OpenAPI 3.0.1 YAML 块），按文档站左侧分组存成 `spec/pages/<分组英文名>/<控制器>-<方法>.md`（映射表 `TAG_DIR`，产品分组带 `product_type_id` 前缀，如 `2-static-standard/device-accountList.md`），同一分组同一接口有多页时文件名带 Apifox 页面 id → `scripts/lib/merge.ts` 按接口路径合并变体页、应用 `spec/overrides.yaml` → `scripts/build-spec.ts` 写出 `spec/tools.json`。原始页和生成物都提交入库，`spec/pages/` 同时是快照测试的输入；目录与文件名由 `placePages()` 决定，不要手动改名，`test/spec.test.ts` 会校验。
+开发期（生成链路）：文档站 `llms.txt` → `scripts/sync-docs.ts` 下载 85 个接口页（每页一个 OpenAPI 3.0.1 YAML 块），按文档站左侧分组存成 `spec/pages/<分组英文名>/<控制器>-<方法>.md`（映射表 `TAG_DIR`，产品分组带 `product_type_id` 前缀，如 `2-static-standard/device-accountList.md`；产品 11 存在 `11-dynamic-bandwidth/`），同一分组同一接口有多页时文件名带 Apifox 页面 id → `scripts/lib/merge.ts` 按接口路径合并变体页、应用 `spec/overrides.yaml` → `scripts/build-spec.ts` 写出 `spec/tools.json`。原始页和生成物都提交入库，`spec/pages/` 同时是快照测试的输入；目录与文件名由 `placePages()` 决定，不要手动改名，`test/spec.test.ts` 会校验。
 
 运行期：`src/index.ts` 只读 `spec/tools.json`，用 `fromJsonSchema()` 把每个工具的 JSON Schema 原样注册给 SDK，SDK 用内置 Ajv 在调用前校验（所有对象都 `additionalProperties: false`，写错参数名会被拒绝而不是发给后端）。`src/http.ts` 把参数经 `src/form.ts` 编成 `application/x-www-form-urlencoded`（PHP 括号格式 `content[0][id]=…`），只读工具 GET、其余 POST，每个请求都附带参数 `is_mcp_send=1` 和请求头 `User-Agent: quanqiudaili mcp` 供后端识别 MCP 流量，再把后端 `{code,msg,time,data}` 映射成 MCP 结果。`--readonly` 就是按 `readOnly` 过滤同一份工具表。运行期不 import zod、不解析 YAML、不联网拉文档。
 
@@ -33,18 +33,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 不要手改 `spec/tools.json`。工具名、中文描述、只读与破坏性标注、按产品拆分、参数类型/描述/枚举/必填的修正都在 `spec/overrides.yaml`，按接口路径做 key；改完 `npm run build-spec`，再 `npm test`，快照变化合理就 `-u`。`test/spec.test.ts` 会校验 `tools.json` 与当前生成结果一致，忘了重生成会红。同一接口只取 data 里一个字段的派生工具（如 `user_balance` 取 `user_info` 的 `money`）写在 overrides 顶层 `derived`，生成时从来源工具复制并带上 `pick`，运行期 `callApi` 只返回该字段。
 
-合并规则要点（细节见 `docs/2026-09-24-设计方案.md` 第 3 节）：同路径各页参数取并集；顶层参数要在全部变体页都必填才必填，部分必填写进描述；`product_type_id` 强制 integer，枚举取各页"此处固定为 N"；`name[0][key]` 转对象数组，`name[]` 转数组；描述去掉 HTML 标签。文档站新增接口会让生成失败并列出路径，把它加进 overrides 或 `ignore`。文档缺陷的兜底条目在 overrides 里带"文档缺陷兜底"注释，并登记到设计文档第 11 节，文档站修好后删除。
+合并规则要点（细节见 `docs/2026-09-24-设计方案.md` 第 3 节）：同路径各页参数取并集；顶层参数要在全部变体页都必填才必填，部分必填写进描述；`product_type_id` 强制 integer，枚举取各页"此处固定为 N"；`name[0][key]` 转对象数组，`name[]` 转数组；描述去掉 HTML 标签。`split` 可按 `productTypeIds` 或文档 `tags` 拆分；产品 11 的新购与退单按分组拆分，避免与时长产品的参数混合。文档站新增接口会让生成失败并列出路径，把它加进 overrides 或 `ignore`。文档缺陷的兜底条目在 overrides 里带"文档缺陷兜底"注释，并登记到设计文档第 11 节，文档站修好后删除。
 
 ## 后端事实（已对照 proxy-distribution-system 源码核实）
 
 - token 是网站 API Keys 页面生成的 API Key（永久有效），放请求头 `token`。登录、登出、token 检测与刷新接口已下线。成功 `{code:1,…}`；业务错误 HTTP 200 `{code:0,msg}`；未登录 HTTP 401 `{code:401,msg:"请先登录"}`；限流 `{code:0,msg:"访问频繁,请稍后再试!"}`，每接口每 IP 每分钟 180 次。
 - 查询接口大多用 `request->param()` 取参，GET 和 POST 都收；`common/countryList`、`stateList`、`cityList` 三个只读 GET 查询串，所以"查询一律 GET"是必要的。
-- `product_type_id`：1 动态住宅流量不限时长、6 动态住宅流量包月、2 静态住宅普通、3 静态住宅原生、4 静态住宅运营商原生、8 数据中心。
+- `product_type_id`：1 动态住宅流量不限时长、6 动态住宅流量包月、2 静态住宅普通、3 静态住宅原生、4 静态住宅运营商原生、8 数据中心、11 动态住宅不限流量（按带宽计费）。
+- 产品 11 用 `order_buy_dynamic_bandwidth`、`order_renew_dynamic_bandwidth`、`order_upgrade_dynamic_bandwidth`、`order_refund_dynamic_bandwidth`。每次新购一个子账号，无自动续费；`country` 是小写网关区域码 `us`/`sg`/`eu`，不是 ISO 出口国家码，创建后不能更换。现有库存及价格工具不提供产品 11 的库存或报价，实际扣费以后端计算为准。退单审核通过后删除并终止子账号，不可恢复。
 - `createBandwidthUpgradeOrder` 的 `pay_method` 固定 `balance`，用 overrides 的 `fixed` 加 `drop` 实现。
 - `createRenewProductBuyOrder` 的 `is_renew`（0/1）不传当 0，并把 `is_renew`、`renew_with_bandwidth`、`renew_timelen` 写回子账号的自动续费设置（`ProductPackage.php` 续费流程），照文档直接调一次就会把用户开着的自动续费关掉。文档 2026-09-27 起写了这个参数，overrides 用 `drop` 把它挡在工具外，由 `src/renew.ts` 沿用当前值。
-- `createProductBuyOrder` 的 `num` 对全部产品都是 1-300（动态按 GB），数据中心单次最多 50。业务上数据中心禁止购买、续费 7 天，但后端校验 `timelen` 对全部产品放行 0；维护者已确定不改 externalapi，MCP 只在描述里提示。
+- `createProductBuyOrder` 的 `num` 对原有产品都是 1-300（动态流量按 GB），数据中心单次最多 50；产品 11 每单固定一个子账号，不暴露 `num`。业务上数据中心禁止购买、续费 7 天，但后端校验 `timelen` 对原有产品放行 0；维护者已确定不改 externalapi，MCP 只在描述里提示。
 - 改备注（单个与批量）、改账密、设置流量上限都经 `api/controller/Base.php` 的 `updateUserInfor` 下发，没传的协议、切换周期、去重会按 socks5、3600 秒、1 天一起下发；go 端是否因此覆盖原设置待手测，MCP 侧怎么处理待定。
-- 子账号 id 类参数一律 string（数组元素也是），`test/spec.test.ts` 有断言；`order_product_buy_id` 保持 integer。
+- 子账号 id 类参数一律 string（数组元素也是），`test/spec.test.ts` 有断言；产品 11 列表的 `id` 是 Go ID（用于 `ids` 筛选），续费、升级必须取本地 `sub_account_id`；退单取首个新购订单的 `order_product_buy_id`，保持 integer。
 
 ## 规则
 

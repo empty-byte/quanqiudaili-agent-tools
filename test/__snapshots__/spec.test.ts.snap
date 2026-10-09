@@ -371,6 +371,60 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "购买动态住宅流量",
   },
   {
+    "description": "会从账户余额扣费。购买按带宽计费的动态不限流量（产品 11），每次创建一个子账号并立即发货；按网关区域、带宽和 30/90/180 天计费，创建后不能更换网关。现有价格查询工具不返回本产品报价，实际扣费以后端计算为准。",
+    "destructive": true,
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "bandwidth_num": {
+          "description": "带宽，单位 Mbps，10-1000 且为 10 的倍数",
+          "type": "integer",
+        },
+        "bill_timelen": {
+          "description": "购买时长：1=30天，2=90天，3=180天",
+          "enum": [
+            1,
+            2,
+            3,
+          ],
+          "type": "integer",
+        },
+        "country": {
+          "description": "接入网关区域码，不是 ISO 3166-1 出口国家码：us=美洲，sg=亚洲，eu=欧洲；创建后不能更换",
+          "enum": [
+            "us",
+            "sg",
+            "eu",
+          ],
+          "type": "string",
+        },
+        "product_type_id": {
+          "description": "产品类型：11=动态住宅不限流量（按带宽计费）",
+          "enum": [
+            11,
+          ],
+          "type": "integer",
+        },
+        "remark": {
+          "description": "创建的子账号备注，可不传",
+          "type": "string",
+        },
+      },
+      "required": [
+        "product_type_id",
+        "bill_timelen",
+        "country",
+        "bandwidth_num",
+      ],
+      "type": "object",
+    },
+    "method": "POST",
+    "name": "order_buy_dynamic_bandwidth",
+    "path": "/externalapi/product_order/createProductBuyOrder",
+    "readOnly": false,
+    "title": "购买动态住宅不限流量",
+  },
+  {
     "description": "会从账户余额扣费，金额是账号等级的测试单价 × 数量，另加带宽费，和时长无关。购买短期测试用的时长 IP，子账号建在调用者自己名下；只有已实名的代理商账号能调用，普通账号会被拒绝。",
     "destructive": true,
     "inputSchema": {
@@ -563,6 +617,33 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "申请退单",
   },
   {
+    "description": "审核通过后会删除并终止子账号，不可恢复。为动态不限流量的新购订单申请退单，由代理商或平台审核；仅限下单 1 天内、已支付、未开发票且无后续续费或升级记录的购买订单，不能重复申请。退款按审核时未使用天数折算，已用不足一天按一天扣除；每单对应一个子账号，不需要 ids。",
+    "destructive": true,
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "order_product_buy_id": {
+          "description": "首个新购订单 ID，取 sub_account_list 产品 11 返回的 order_product_buy_id",
+          "type": "integer",
+        },
+        "remark": {
+          "description": "退单原因",
+          "type": "string",
+        },
+      },
+      "required": [
+        "order_product_buy_id",
+        "remark",
+      ],
+      "type": "object",
+    },
+    "method": "POST",
+    "name": "order_refund_dynamic_bandwidth",
+    "path": "/externalapi/order_back/createOrderBack",
+    "readOnly": false,
+    "title": "申请动态住宅不限流量退单",
+  },
+  {
     "description": "会从账户余额扣费。为时长类子账号续费，sub_account_ids 为逗号分隔的子账号 id。数据中心不能续 7 天。不会改动子账号的自动续费开关，但会把本次续费时长写成子账号以后自动续费的时长；renew_with_bandwidth 不传时沿用各子账号当前设置，子账号之间设置不一致时请分开续费。",
     "destructive": true,
     "inputSchema": {
@@ -614,6 +695,69 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "path": "/externalapi/product_order/createRenewProductBuyOrder",
     "readOnly": false,
     "title": "续费时长 IP",
+  },
+  {
+    "description": "会从账户余额扣费。为动态不限流量子账号续费，按当前带宽和网关当前价计费，不改变带宽；未到期从原到期时间延长，已到期从当前时间起算，到期后 7 天内可续费。赠送测试账号或有待审核退单申请的账号不能续费；不支持自动续费。现有价格查询工具不返回本产品报价，实际扣费以后端计算为准。",
+    "destructive": true,
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "bill_timelen": {
+          "description": "续费时长：1=30天，2=90天，3=180天",
+          "enum": [
+            1,
+            2,
+            3,
+          ],
+          "type": "integer",
+        },
+        "sub_account_id": {
+          "description": "本地子账号 ID，必须取 sub_account_list 产品 11 返回的 sub_account_id，不是 id 字段",
+          "type": "string",
+        },
+        "user_conpon_id": {
+          "description": "优惠券 ID，可不传；自定义价不与优惠券叠加",
+          "type": "string",
+        },
+      },
+      "required": [
+        "sub_account_id",
+        "bill_timelen",
+      ],
+      "type": "object",
+    },
+    "method": "POST",
+    "name": "order_renew_dynamic_bandwidth",
+    "path": "/externalapi/product_order/createBandwidthRenewOrder",
+    "readOnly": false,
+    "title": "续费动态住宅不限流量",
+  },
+  {
+    "description": "会从账户余额扣费。立即提高动态不限流量子账号的带宽，只升不降，到期时间不变；仅限未到期正式子账号。差价按新档月总价减原成交月总价，再乘剩余天数除以 30；剩余天数向上取整，不足一天按一天。不支持优惠券，现有带宽试算工具仅适用于时长类产品，实际扣费以后端计算为准。",
+    "destructive": true,
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "bandwidth_num": {
+          "description": "目标带宽，单位 Mbps，必须大于当前带宽，10-1000 且为 10 的倍数",
+          "type": "integer",
+        },
+        "sub_account_id": {
+          "description": "本地子账号 ID，必须取 sub_account_list 产品 11 返回的 sub_account_id，不是 id 字段",
+          "type": "string",
+        },
+      },
+      "required": [
+        "sub_account_id",
+        "bandwidth_num",
+      ],
+      "type": "object",
+    },
+    "method": "POST",
+    "name": "order_upgrade_dynamic_bandwidth",
+    "path": "/externalapi/product_order/createBandwidthUpgradeOrderForDrfbw",
+    "readOnly": false,
+    "title": "升级动态住宅不限流量带宽",
   },
   {
     "description": "查询平台启用的产品列表，返回产品 id、名称和账号后缀。",
@@ -1064,7 +1208,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
     "title": "子账号流量上限",
   },
   {
-    "description": "分页查询子账号，覆盖全部产品类型；返回用户名、密码、端口、协议、国家、流量等。按 searchArr 批量搜索时，一条都没命中会返回不带筛选的全部子账号而不是空列表，要核对返回的是不是要找的子账号。",
+    "description": "分页查询子账号，覆盖全部产品类型，含动态不限流量（11）。产品 11 的 id 是 Go 子账号 ID，用于 ids 筛选；续费和升级必须取 sub_account_id（本地 ID），退单取 order_product_buy_id。返回用户名、密码、端口、协议、国家、流量等。旧产品按 searchArr 批量搜索时，零命中可能返回全部子账号，要核对返回的是不是要找的子账号。",
     "destructive": false,
     "inputSchema": {
       "additionalProperties": false,
@@ -1090,7 +1234,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "product_type_id": {
-          "description": "产品类型：1=动态住宅流量（不限时长），2=静态住宅（普通），3=静态住宅（原生），4=静态住宅（运营商原生），6=动态住宅流量（包月），8=数据中心",
+          "description": "产品类型：1=动态住宅流量（不限时长），2=静态住宅（普通），3=静态住宅（原生），4=静态住宅（运营商原生），6=动态住宅流量（包月），8=数据中心，11=动态住宅不限流量（按带宽计费）",
           "enum": [
             1,
             2,
@@ -1098,6 +1242,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
             4,
             6,
             8,
+            11,
           ],
           "type": "integer",
         },
@@ -1106,7 +1251,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "string",
         },
         "searchArr": {
-          "description": "批量搜索的值列表，内容由 search_type 决定：自定义用户名、出口 IP 或备注关键词，一次最多 100 个。批量搜索只对时长类产品（2/3/4/8）有效；动态产品（1/6）只能按自定义用户名搜 1 个",
+          "description": "搜索的值列表，内容由 search_type 决定：子账号名、出口 IP 或备注关键词，一次最多 100 个。时长类产品（2/3/4/8）与动态不限流量（11）支持这些搜索；流量产品（1/6）只能按自定义用户名搜 1 个",
           "items": {
             "description": "单个搜索值",
             "type": "string",
@@ -1114,7 +1259,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "array",
         },
         "search_type": {
-          "description": "批量搜索类型，和 searchArr 一起用：0=按自定义用户名精确找，1=按出口 IP 精确找，2=按备注模糊找（多个关键词任一命中即可）",
+          "description": "搜索类型，和 searchArr 一起用：0=按子账号名精确找（时长类用自定义用户名），1=按出口 IP 精确找，2=按备注模糊找",
           "enum": [
             0,
             1,

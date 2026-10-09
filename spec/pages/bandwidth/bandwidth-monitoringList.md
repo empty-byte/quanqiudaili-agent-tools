@@ -37,7 +37,7 @@ paths:
               type: string
         - name: token
           in: header
-          description: ''
+          description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
           required: false
           example: '{{access_token}}'
           schema:
@@ -109,6 +109,23 @@ paths:
                   - msg
                   - time
                   - data
+              example:
+                code: 1
+                msg: 获取成功!
+                time: '1755253333'
+                data:
+                  list:
+                    - downstreamTraffic: 0
+                      exitPortIP: 96.62.135.150
+                      subAccount: '69607'
+                      upstreamTraffic: 0
+                      bindUser: zhizhuipsrt-69607
+                    - downstreamTraffic: 0
+                      exitPortIP: 89.42.40.173
+                      subAccount: '69606'
+                      upstreamTraffic: 0
+                      bindUser: zhizhuipsrt-69606
+                  total: 2
           headers: {}
           x-apifox-name: 成功
       security: []

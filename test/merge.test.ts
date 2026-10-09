@@ -120,6 +120,33 @@ describe('buildTools', () => {
     const pages = [page('a', '/buy', 1, [['product_type_id', true, 'integer']]), page('c', '/buy', 2, [['product_type_id', true, 'integer']])];
     expect(() => buildTools(pages, { ignore: [], tools: { '/buy': { split: [{ ...ov('x'), productTypeIds: [1] }] } } })).toThrow(/未被拆分规则覆盖/);
   });
+
+  it('split 按分组隔离参数不同的同路径接口，避免文档错误产品 id 混入旧产品', () => {
+    const staticTag = '用户IP子账号管理/静态住宅（原生）时长子账号';
+    const bandwidthTag = '用户IP子账号管理/动态住宅不限流量';
+    const tools = buildTools([
+      { ...page('static', '/buy', 3, [['product_type_id', true, 'integer'], ['num', true, 'integer']]), tag: staticTag },
+      { ...page('bandwidth', '/buy', 3, [['product_type_id', true, 'integer'], ['bandwidth_num', true, 'integer']]), tag: bandwidthTag },
+      { ...page('static-back', '/back', undefined, [['ids[]', true], ['remark', true]]), tag: staticTag },
+      { ...page('bandwidth-back', '/back', undefined, [['remark', true]]), tag: bandwidthTag },
+    ], { ignore: [], tools: {
+      '/buy': { split: [
+        { ...ov('static_buy'), productTypeIds: [2, 3, 4, 8], tags: [staticTag] },
+        { ...ov('bandwidth_buy'), tags: [bandwidthTag], params: { product_type_id: { enum: [11] } } },
+      ] },
+      '/back': { split: [
+        { ...ov('static_back'), tags: [staticTag] },
+        { ...ov('bandwidth_back'), tags: [bandwidthTag] },
+      ] },
+    } });
+    const byName = (name: string) => tools.find(t => t.name === name)!;
+    expect(byName('static_buy').inputSchema.properties).not.toHaveProperty('bandwidth_num');
+    expect(byName('bandwidth_buy').inputSchema.properties).not.toHaveProperty('num');
+    expect(byName('bandwidth_buy').inputSchema.properties.product_type_id.enum).toEqual([11]);
+    expect(byName('bandwidth_buy').inputSchema.properties.product_type_id.description).toBe('产品类型：11=动态住宅不限流量（按带宽计费）');
+    expect(byName('static_back').inputSchema.required).toEqual(['ids', 'remark']);
+    expect(byName('bandwidth_back').inputSchema.properties).not.toHaveProperty('ids');
+  });
 });
 
 describe('派生工具', () => {
@@ -173,6 +200,11 @@ describe('placePages', () => {
 
   it('非产品分组也走映射表', () => {
     expect(files(p('3e0', '/externalapi/bandwidth/getBandwidthList', '增值带宽'))).toEqual(['bandwidth/bandwidth-getBandwidthList.md']);
+  });
+
+  it('动态不限流量接口落到产品 11 分组', () => {
+    expect(files(p('518857566e0', '/externalapi/product_order/createBandwidthRenewOrder', '用户IP子账号管理/动态住宅不限流量')))
+      .toEqual(['11-dynamic-bandwidth/product_order-createBandwidthRenewOrder.md']);
   });
 
   it('未登记的分组报错', () => {

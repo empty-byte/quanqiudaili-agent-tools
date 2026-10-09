@@ -3,7 +3,7 @@
 全球代理（quanqiudaili.com）开放接口的 MCP 服务器。接入 Claude Code、Claude Desktop、Cursor、Codex 等支持 MCP 的 AI 客户端后，可以用自然语言查询子账号、库存、价格与余额，并在确认后完成下单、续费与子账号管理。
 
 - 只读模式 `--readonly` 仅暴露 20 个查询工具，不会产生任何费用。
-- 下单、续费、删除等 14 个写操作执行前都需要用户确认，AI 无法代替用户确认。
+- 下单、续费、删除等 18 个写操作执行前都需要用户确认，AI 无法代替用户确认。
 - 参数按接口文档生成并在本地校验，不合法的参数不会发送到后端。
 
 业务逻辑、鉴权与扣费均由后端完成，本项目只是一个 HTTP 客户端。
@@ -103,7 +103,7 @@ Claude Desktop：
 
 | 参数 | 说明 |
 |---|---|
-| 无 | 暴露全部 34 个工具 |
+| 无 | 暴露全部 38 个工具 |
 | `--readonly` | 仅暴露 20 个只读工具 |
 | `--yes` | 写操作不再确认，仅供自动化脚本使用 |
 
@@ -129,7 +129,9 @@ Claude Desktop：
 
 ## 工具清单
 
-产品类型 `product_type_id`：1 动态住宅流量（不限时长）、6 动态住宅流量（包月）、2 静态住宅（普通）、3 静态住宅（原生）、4 静态住宅（运营商原生）、8 数据中心。国家使用 ISO 3166-1 二字码，如 `US`。
+产品类型 `product_type_id`：1 动态住宅流量（不限时长）、6 动态住宅流量（包月）、2 静态住宅（普通）、3 静态住宅（原生）、4 静态住宅（运营商原生）、8 数据中心、11 动态住宅不限流量（按带宽计费）。原有产品的国家使用 ISO 3166-1 二字码，如 `US`；产品 11 的 `country` 使用小写网关区域码 `us`（美洲）、`sg`（亚洲）、`eu`（欧洲），不是出口国家码，购买后不能更换。
+
+产品 11 每次新购一个子账号，不支持自动续费。续费和升级使用 `sub_account_list` 返回的本地 `sub_account_id`；列表的 `ids` 筛选使用 `id`（Go ID），退单使用整数 `order_product_buy_id`（首个新购订单 ID）。现有 `stock_check`、`product_unit_price`、`bandwidth_upgrade_price` 不提供产品 11 的库存或报价，实际扣费以后端计算为准。
 
 只读工具（`--readonly` 模式暴露的全部工具）：
 
@@ -162,10 +164,14 @@ Claude Desktop：
 | sub_account_delete / sub_account_delete_batch | 删除子账号，不可恢复 |
 | order_buy_dynamic | 购买动态住宅流量（产品 1、6），扣费 |
 | order_buy_time_ip | 购买时长 IP（产品 2、3、4、8），扣费 |
+| order_buy_dynamic_bandwidth | 购买动态住宅不限流量（产品 11），扣费 |
 | order_buy_test_ip | 购买时长测试 IP，扣费 |
 | order_renew | 续费时长 IP，扣费；不改变子账号的自动续费设置 |
+| order_renew_dynamic_bandwidth | 续费动态住宅不限流量，扣费；保持当前带宽 |
 | order_bandwidth_upgrade | 带宽升级下单，余额支付 |
+| order_upgrade_dynamic_bandwidth | 升级动态住宅不限流量带宽，扣费；到期时间不变 |
 | order_refund_apply | 申请退单 |
+| order_refund_dynamic_bandwidth | 申请动态住宅不限流量退单；审核通过后删除并终止子账号，不可恢复 |
 
 资源 `quanqiudaili://docs/dynamic-proxy-session`：动态住宅代理连接串的参数说明与示例。
 

@@ -24,7 +24,7 @@ paths:
       parameters:
         - name: token
           in: header
-          description: ''
+          description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
           required: false
           example: '{{access_token}}'
           schema:

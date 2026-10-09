@@ -14,7 +14,7 @@ export interface ToolOverride {
   drop?: string[];
   params?: Record<string, ParamOverride>;
 }
-export interface SplitPart extends ToolOverride { productTypeIds: number[] }
+export interface SplitPart extends ToolOverride { productTypeIds?: number[]; tags?: string[] }
 /** 从已有工具派生、只取响应 data 里一个字段的工具，如账户余额只取 user_info 的 money */
 export interface DerivedTool { name: string; title: string; description: string; from: string; pick: string }
 export interface Overrides { ignore: string[]; tools: Record<string, ToolOverride | { split: SplitPart[] }>; derived?: DerivedTool[] }
@@ -22,6 +22,7 @@ export interface Overrides { ignore: string[]; tools: Record<string, ToolOverrid
 export const PRODUCT_LABELS: Record<number, string> = {
   1: '动态住宅流量（不限时长）', 6: '动态住宅流量（包月）', 2: '静态住宅（普通）',
   3: '静态住宅（原生）', 4: '静态住宅（运营商原生）', 8: '数据中心',
+  11: '动态住宅不限流量（按带宽计费）',
 };
 const ALL_PRODUCTS = [1, 2, 3, 4, 6, 8];
 
@@ -70,6 +71,7 @@ const TAG_DIR: Record<string, string> = {
   '用户IP子账号管理/静态住宅（原生）时长子账号': '3-static-native',
   '用户IP子账号管理/静态住宅（运营商原生）时长子账号': '4-static-isp-native',
   '用户IP子账号管理/数据中心时长子账号': '8-datacenter',
+  '用户IP子账号管理/动态住宅不限流量': '11-dynamic-bandwidth',
   'Token管理': 'token', '用户管理': 'user', '工具管理': 'tool', '增值带宽': 'bandwidth',
 };
 
@@ -264,11 +266,15 @@ export function buildTools(pages: Page[], ov: Overrides): ToolDef[] {
     const o = ov.tools[path];
     if (!o) continue;
     if ('split' in o) {
-      const covered = (p: Page) => o.split.some(s => p.productTypeId !== undefined && s.productTypeIds.includes(p.productTypeId));
+      const matches = (p: Page, part: SplitPart) =>
+        !!(part.productTypeIds || part.tags)
+        && (!part.productTypeIds || (p.productTypeId !== undefined && part.productTypeIds.includes(p.productTypeId)))
+        && (!part.tags || part.tags.some(tag => tag.replace(/\s+/g, '') === (p.tag ?? '').replace(/\s+/g, '')));
+      const covered = (p: Page) => o.split.some(s => matches(p, s));
       const unassigned = group.filter(p => !covered(p));
       if (unassigned.length) throw new Error(`${path} 有页面未被拆分规则覆盖：${unassigned.map(p => p.id).join(', ')}`);
       for (const part of o.split) {
-        const sub = group.filter(p => p.productTypeId !== undefined && part.productTypeIds.includes(p.productTypeId));
+        const sub = group.filter(p => matches(p, part));
         if (!sub.length) throw new Error(`${path} 的拆分 ${part.name} 没有匹配到任何页面`);
         tools.push(mergeGroup(sub, part));
       }
