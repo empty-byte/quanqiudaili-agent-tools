@@ -3,3 +3,4 @@ dist/
 .vitest/
 .mcp.json
 docs/*
+.codex/config.toml
