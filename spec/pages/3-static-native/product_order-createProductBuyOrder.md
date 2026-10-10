@@ -235,7 +235,7 @@ paths:
                       target: proxy.quanqiudaili.com
                       changeInterval: 0
                       expiresIn: 1747272617
-                      ip: 38.30.214.96
+                      ip: 127.0.0.1
                       bill: '0.00'
                       is_diff: 0
                       country: US
@@ -243,7 +243,7 @@ paths:
                       state: California
                       remark: ''
                       city: Los Angeles
-                  order_number: 20250508093017ekVwhy
+                  order_number: 20250508xxxxxx
           headers: {}
           x-apifox-name: 成功
       security: []

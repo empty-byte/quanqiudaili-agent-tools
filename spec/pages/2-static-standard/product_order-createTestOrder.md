@@ -283,15 +283,15 @@ paths:
                     time: '1755667649'
                     data:
                       orderProductBuy:
-                        user_id: 77
+                        user_id: 1
                         order_number: 2025082013xxxxxxx
                         description: 【独享静态住宅（非原生）】，国家/地区：US，城市：，数量：1
                         pay_gateway: 3
                         order_status: 2
                         order_category: 4
-                        origin_money: '6.00'
-                        real_money: '6.00'
-                        balance: '0.07'
+                        origin_money: '0'
+                        real_money: '0'
+                        balance: '0'
                         createtime: 1755667653
                         product_type_id: 2
                         scope_native: ''

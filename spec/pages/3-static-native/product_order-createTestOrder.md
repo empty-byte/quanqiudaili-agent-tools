@@ -283,15 +283,15 @@ paths:
                     time: '1755667649'
                     data:
                       orderProductBuy:
-                        user_id: 77
-                        order_number: 20250820132733kNewGL
+                        user_id: 1
+                        order_number: 20250820xxxxxxx
                         description: 【独享静态住宅（本土原生）】，国家/地区：US，城市：，数量：1
                         pay_gateway: 3
                         order_status: 2
                         order_category: 4
-                        origin_money: '6.00'
-                        real_money: '6.00'
-                        balance: '0.07'
+                        origin_money: '0'
+                        real_money: '0'
+                        balance: '0'
                         createtime: 1755667653
                         product_type_id: 3
                         scope_native: local
@@ -299,7 +299,7 @@ paths:
                         buy_num: '1'
                         country: US
                         area: ''
-                        id: '43550'
+                        id: '1'
                       rows:
                         - password: test
                           username: test
@@ -316,7 +316,7 @@ paths:
                           changeInterval: 0
                           expiresIn: 1755926851
                           expiresDate: '2025-08-23 13:27:31'
-                          ip: 96.62.48.237
+                          ip: 127.0.0.1
                           bill: '0.00'
                           is_diff: 0
                           country: US

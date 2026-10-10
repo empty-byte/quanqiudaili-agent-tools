@@ -347,15 +347,15 @@ paths:
                   orderProductBuy:
                     id: 1
                     user_id: 1
-                    order_number: '20260922174'
+                    order_number: 202609xxxxx
                     description: 【全球动态住宅 - 动态不限流量】带宽升级 10Mbps → 20Mbps
                     pay_gateway: 3
                     ums_wallet: null
                     order_status: 2
                     order_category: 1
-                    origin_money: '40.00'
-                    real_money: '40.00'
-                    real_money_ip: '40.00'
+                    origin_money: '1.00'
+                    real_money: '1.00'
+                    real_money_ip: '1.00'
                     real_money_bandwidth: '0.00'
                     back_money_ip: '0.00'
                     back_money_bandwidth: '0.00'
@@ -368,7 +368,7 @@ paths:
                     product_type_id: 11
                     bill_timelen: '1'
                     is_back: '0'
-                    balance: '1713.11'
+                    balance: '1.00'
                     remark: null
                     createtime: 1790070111
                     updatetime: null
@@ -399,8 +399,8 @@ paths:
                     is_use_random_account_password: 0
                     use_ip_port: 0
                     order_source: 2
-                  money: 40
-                  remain_days: 60
+                  money: 1
+                  remain_days: 1
                   sub_account_id: 1951
                   bandwidth_num: 20
           headers: {}

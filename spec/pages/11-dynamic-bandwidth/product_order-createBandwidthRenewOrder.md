@@ -338,15 +338,15 @@ paths:
                   orderProductBuy:
                     id: 1
                     user_id: 1
-                    order_number: '2026092217300'
+                    order_number: 202609xxxx
                     description: 【全球动态住宅 - 动态不限流量】续费 10Mbps/30天
                     pay_gateway: 3
                     ums_wallet: null
                     order_status: 2
                     order_category: 1
-                    origin_money: '500.00'
-                    real_money: '20.00'
-                    real_money_ip: '20.00'
+                    origin_money: '1.00'
+                    real_money: '1.00'
+                    real_money_ip: '1.00'
                     real_money_bandwidth: '0.00'
                     back_money_ip: '0.00'
                     back_money_bandwidth: '0.00'
@@ -390,7 +390,7 @@ paths:
                     is_use_random_account_password: 0
                     use_ip_port: 0
                     order_source: 2
-                  sub_account_id: 1951
+                  sub_account_id: 1
                   expiresIn: 1795252797
                   expireDate: '2026-11-21 17:19:57'
           headers: {}

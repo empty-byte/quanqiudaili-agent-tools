@@ -147,9 +147,9 @@ paths:
                 data:
                   is_sufficient: true
                   segments:
-                    - cidr: '149.52'
+                    - cidr: '127.0'
                       is_sufficient: true
-                    - cidr: '150.241'
+                    - cidr: '128.0'
                       is_sufficient: true
           headers: {}
           x-apifox-name: 成功
