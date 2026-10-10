@@ -39,7 +39,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - token 是网站 API Keys 页面生成的 API Key（永久有效），放请求头 `token`。登录、登出、token 检测与刷新接口已下线。成功 `{code:1,…}`；业务错误 HTTP 200 `{code:0,msg}`；未登录 HTTP 401 `{code:401,msg:"请先登录"}`；限流 `{code:0,msg:"访问频繁,请稍后再试!"}`，每接口每 IP 每分钟 180 次。
 - 只读工具统一使用 GET；`common/countryList`、`stateList`、`cityList` 的参数必须放在查询串中。
 - `product_type_id`：1 动态住宅流量不限时长、6 动态住宅流量包月、2 静态住宅普通、3 静态住宅原生、4 静态住宅运营商原生、8 数据中心、11 动态住宅不限流量（按带宽计费）。
-- 产品 11 用 `order_buy_dynamic_bandwidth`、`order_renew_dynamic_bandwidth`、`order_upgrade_dynamic_bandwidth`、`order_refund_dynamic_bandwidth`。每次新购一个子账号，无自动续费；`country` 是小写网关区域码 `us`/`sg`/`eu`，不是 ISO 出口国家码，创建后不能更换。现有库存及价格工具不提供产品 11 的库存或报价，实际扣费以后端计算为准。退单审核通过后删除并终止子账号，不可恢复。
+- 产品 11 用 `order_buy_dynamic_bandwidth`、`order_renew_dynamic_bandwidth`、`order_upgrade_dynamic_bandwidth`、`order_refund_dynamic_bandwidth`。每次新购一个子账号，无自动续费；`country` 使用接入网关国家码 `US`/`DE`/`SG`，支持小写 `us`/`de`/`sg`，保留旧区域码 `eu`（对应 `DE`）；创建后不能更换，也不用于指定代理出口国家。现有库存及价格工具不提供产品 11 的库存或报价，实际扣费以后端计算为准。退单审核通过后删除并终止子账号，不可恢复。
+- 周期限流 `timelen=3` 为自然季度，从当年 1/4/7/10 月的 1 日开始统计和重置；`type=0` 的永久限流忽略周期。
 - `createBandwidthUpgradeOrder` 的 `pay_method` 固定 `balance`，用 overrides 的 `fixed` 加 `drop` 实现。
 - `createProductBuyOrder` 的 `num` 对原有产品都是 1-300（动态流量按 GB），数据中心单次最多 50；产品 11 每单固定一个子账号，不暴露 `num`。数据中心不支持购买或续费 7 天，工具描述中须保留这一限制。
 - 子账号 id 类参数一律 string（数组元素也是），`test/spec.test.ts` 有断言；产品 11 列表的 `id` 是 Go ID（用于 `ids` 筛选），续费、升级必须取本地 `sub_account_id`；退单取首个新购订单的 `order_product_buy_id`，保持 integer。

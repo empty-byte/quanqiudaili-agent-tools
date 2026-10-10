@@ -390,9 +390,13 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "country": {
-          "description": "接入网关区域码，不是 ISO 3166-1 出口国家码：us=美洲，sg=亚洲，eu=欧洲；创建后不能更换",
+          "description": "接入网关国家码（ISO 3166-1）：US=美国、DE=德国、SG=新加坡；支持小写国家码，保留旧区域码 eu（对应 DE）；创建后不能更换，不用于指定代理出口国家",
           "enum": [
+            "US",
+            "DE",
+            "SG",
             "us",
+            "de",
             "sg",
             "eu",
           ],
@@ -668,7 +672,7 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "sub_account_ids": {
-          "description": "要续费的子账号 id，多个用英文逗号连接，一次最多 300 个",
+          "description": "要续费的子账号 id，多个用英文逗号连接；去空格、去空值、去重后一次最多 300 个，每个账号只续费一次",
           "type": "string",
         },
         "timelen": {
@@ -1362,11 +1366,12 @@ exports[`spec/tools.json > 完整快照 1`] = `
           "type": "integer",
         },
         "timelen": {
-          "description": "周期：0 天、1 周、2 月、4 年；type=1 时应传，不传按天；type=0 时忽略",
+          "description": "周期：0 天、1 周、2 月、3 自然季度、4 年；季度从 1/4/7/10 月的 1 日起算；type=1 时应传，不传按天；type=0 时忽略",
           "enum": [
             0,
             1,
             2,
+            3,
             4,
           ],
           "type": "integer",

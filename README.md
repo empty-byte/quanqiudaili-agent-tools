@@ -131,7 +131,7 @@ Claude Desktop：
 
 ## 工具清单
 
-产品类型 `product_type_id`：1 动态住宅流量（不限时长）、6 动态住宅流量（包月）、2 静态住宅（普通）、3 静态住宅（原生）、4 静态住宅（运营商原生）、8 数据中心、11 动态住宅不限流量（按带宽计费）。原有产品的国家使用 ISO 3166-1 二字码，如 `US`；产品 11 的 `country` 使用小写网关区域码 `us`（美洲）、`sg`（亚洲）、`eu`（欧洲），不是出口国家码，购买后不能更换。
+产品类型 `product_type_id`：1 动态住宅流量（不限时长）、6 动态住宅流量（包月）、2 静态住宅（普通）、3 静态住宅（原生）、4 静态住宅（运营商原生）、8 数据中心、11 动态住宅不限流量（按带宽计费）。国家使用 ISO 3166-1 二字码，如 `US`；产品 11 的 `country` 指接入网关国家：`US`（美国）、`DE`（德国）、`SG`（新加坡），支持小写国家码并保留旧区域码 `eu`（对应 `DE`）。该参数不用于指定代理出口国家，购买后不能更换。
 
 产品 11 每次新购一个子账号，不支持自动续费。续费和升级使用 `sub_account_list` 返回的本地 `sub_account_id`；列表的 `ids` 筛选使用 `id`（Go ID），退单使用整数 `order_product_buy_id`（首个新购订单 ID）。现有 `stock_check`、`product_unit_price`、`bandwidth_upgrade_price` 不提供产品 11 的库存或报价，实际扣费以后端计算为准。
 
@@ -162,7 +162,7 @@ Claude Desktop：
 | sub_account_update / sub_account_update_batch | 修改子账号备注 |
 | sub_account_set_credentials | 设置子账号自定义账密 |
 | sub_account_toggle_direct | 批量开关直连 |
-| sub_account_set_limit_flow | 设置流量上限 |
+| sub_account_set_limit_flow | 设置永久或按天、周、月、自然季度、年的流量上限 |
 | sub_account_delete / sub_account_delete_batch | 删除子账号，不可恢复 |
 | order_buy_dynamic | 购买动态住宅流量（产品 1、6），扣费 |
 | order_buy_time_ip | 购买时长 IP（产品 2、3、4、8），扣费 |

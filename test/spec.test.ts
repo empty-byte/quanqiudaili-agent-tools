@@ -61,7 +61,7 @@ describe('spec/tools.json', () => {
     expect(bandwidth.inputSchema.properties).toMatchObject({
       product_type_id: { type: 'integer', enum: [11] },
       bill_timelen: { type: 'integer', enum: [1, 2, 3] },
-      country: { type: 'string', enum: ['us', 'sg', 'eu'] },
+      country: { type: 'string', enum: ['US', 'DE', 'SG', 'us', 'de', 'sg', 'eu'] },
       bandwidth_num: { type: 'integer' },
       remark: { type: 'string' },
     });
@@ -129,7 +129,8 @@ describe('spec/tools.json', () => {
   it('文档缺陷兜底生效', () => {
     const limit = byName('sub_account_set_limit_flow');
     expect(limit.inputSchema.properties.type).toMatchObject({ type: 'integer', enum: [0, 1] });
-    expect(limit.inputSchema.properties.timelen.type).toBe('integer');
+    expect(limit.inputSchema.properties.timelen).toMatchObject({ type: 'integer', enum: [0, 1, 2, 3, 4] });
+    expect(limit.inputSchema.properties.timelen.description).toContain('自然季度');
     expect(byName('sub_account_limit_flow').inputSchema.required).toEqual(['product_type_id', 'id']);
     expect([...byName('order_renew').inputSchema.required].sort()).toEqual(['product_type_id', 'sub_account_ids', 'timelen']);
   });

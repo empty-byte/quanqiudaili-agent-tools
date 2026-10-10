@@ -145,11 +145,12 @@ describe('stdio server', () => {
   }, 20_000);
 
   it.each([
-    { name: 'order_buy_dynamic_bandwidth', arguments: { product_type_id: 11, bill_timelen: 1, country: 'US', bandwidth_num: 10 }, error: /allowed values/ },
+    { name: 'order_buy_dynamic_bandwidth', arguments: { product_type_id: 11, bill_timelen: 1, country: 'FR', bandwidth_num: 10 }, error: /allowed values/ },
     { name: 'order_renew_dynamic_bandwidth', arguments: { sub_account_id: '1951', bill_timelen: 0 }, error: /allowed values/ },
     { name: 'order_renew_dynamic_bandwidth', arguments: { sub_account_id: 1951, bill_timelen: 1 }, error: /must be string/ },
     { name: 'order_upgrade_dynamic_bandwidth', arguments: { sub_account_id: 1951, bandwidth_num: 20 }, error: /must be string/ },
-  ])('动态带宽 $name 的非法参数被 SDK 拦截，不请求后端', async ({ name, arguments: args, error }) => {
+    { name: 'sub_account_set_limit_flow', arguments: { product_type_id: 1, id: '42', limit_flow: 5, type: 1, timelen: 5 }, error: /allowed values/ },
+  ])('工具 $name 的非法参数被 SDK 拦截，不请求后端', async ({ name, arguments: args, error }) => {
     const c = await connect(['--yes']);
     try {
       hits.length = 0;
@@ -157,6 +158,25 @@ describe('stdio server', () => {
       expect(r.isError).toBe(true);
       expect(textOf(r)).toMatch(error);
       expect(hits).toHaveLength(0);
+    } finally {
+      await c.close();
+    }
+  }, 20_000);
+
+  it('产品 11 国家码与旧网关码均通过校验并原样发送给后端', async () => {
+    const c = await connect(['--yes']);
+    try {
+      for (const country of ['US', 'DE', 'SG', 'us', 'de', 'sg', 'eu']) {
+        hits.length = 0;
+        const result = await c.callTool({
+          name: 'order_buy_dynamic_bandwidth',
+          arguments: { product_type_id: 11, bill_timelen: 1, country, bandwidth_num: 10 },
+        });
+        expect(result.isError, country).toBeFalsy();
+        expect(hits).toHaveLength(1);
+        expect(hits[0]).toMatchObject({ method: 'POST', url: '/externalapi/product_order/createProductBuyOrder' });
+        expect(new URLSearchParams(hits[0].body).get('country')).toBe(country);
+      }
     } finally {
       await c.close();
     }
@@ -189,9 +209,9 @@ describe('写操作确认', () => {
   it.each([
     {
       name: 'order_buy_dynamic_bandwidth',
-      arguments: { product_type_id: 11, bill_timelen: 1, country: 'us', bandwidth_num: 10, remark: 'test' },
+      arguments: { product_type_id: 11, bill_timelen: 1, country: 'DE', bandwidth_num: 10, remark: 'test' },
       path: '/externalapi/product_order/createProductBuyOrder',
-      body: 'product_type_id=11&bill_timelen=1&country=us&bandwidth_num=10&remark=test&is_mcp_send=1',
+      body: 'product_type_id=11&bill_timelen=1&country=DE&bandwidth_num=10&remark=test&is_mcp_send=1',
     },
     {
       name: 'order_renew_dynamic_bandwidth',
@@ -211,7 +231,13 @@ describe('写操作确认', () => {
       path: '/externalapi/order_back/createOrderBack',
       body: 'order_product_buy_id=99&remark=test&is_mcp_send=1',
     },
-  ])('动态带宽 $name 先返回确认码，确认后只发一次 POST', async ({ name, arguments: args, path, body }) => {
+    {
+      name: 'sub_account_set_limit_flow',
+      arguments: { product_type_id: 1, id: '42', limit_flow: 5, type: 1, timelen: 3 },
+      path: '/externalapi/tool/accountLimitFlowEdit',
+      body: 'product_type_id=1&id=42&limit_flow=5&type=1&timelen=3&is_mcp_send=1',
+    },
+  ])('写工具 $name 先返回确认码，确认后只发一次 POST', async ({ name, arguments: args, path, body }) => {
     const c = await connect([]);
     try {
       hits.length = 0;

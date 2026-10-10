@@ -8,7 +8,7 @@ type Handler = (input: Record<string, unknown>, ctx: ServerContext) => Promise<C
  * 后端续费接口会把本次的 is_renew（不传当 0）和 renew_with_bandwidth 写回子账号的自动续费设置，
  * 照文档直接调一次就会把用户开着的自动续费关掉。所以续费前先查子账号当前值：
  * is_renew 一律沿用，renew_with_bandwidth 没传才沿用；子账号之间不一致就报错让调用方分开续费。
- * 后端按原串拆 ids：重复的 id 只计一次价、到期却叠加延长，带空格的 id 会漏掉带宽记录，所以发出去的是去空格、去重后的 ids。
+ * 后端也会规范化 ids；这里提前去空格、去重，让查询、确认预览和实际续费使用同一份账号列表。
  */
 export async function fillRenewDefaults(args: Record<string, unknown>, list: ToolDef, cfg: Cfg, fetchImpl?: typeof fetch): Promise<Record<string, unknown>> {
   const fields = ['is_renew', 'renew_with_bandwidth'].filter(f => args[f] === undefined);

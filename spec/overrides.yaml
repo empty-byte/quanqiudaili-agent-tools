@@ -212,7 +212,7 @@ tools:
     params: # 文档没有给 type、timelen 枚举，类型也不统一
       id: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
       type: { type: integer, enum: [0, 1], description: 限流类型：0 = 永久，按子账号累计用量（默认）；1 = 周期 }
-      timelen: { type: integer, enum: [0, 1, 2, 4], description: 周期：0 天、1 周、2 月、4 年；type=1 时应传，不传按天；type=0 时忽略 } 
+      timelen: { type: integer, enum: [0, 1, 2, 3, 4], description: 周期：0 天、1 周、2 月、3 自然季度、4 年；季度从 1/4/7/10 月的 1 日起算；type=1 时应传，不传按天；type=0 时忽略 }
   /externalapi/device/accountDelete:
     name: sub_account_delete
     title: 删除单个子账号
@@ -264,7 +264,7 @@ tools:
         params:
           product_type_id: { enum: [11] }
           bill_timelen: { type: integer, enum: [1, 2, 3], description: 购买时长：1=30天，2=90天，3=180天 }
-          country: { enum: [us, sg, eu], description: 接入网关区域码，不是 ISO 3166-1 出口国家码：us=美洲，sg=亚洲，eu=欧洲；创建后不能更换 } # 文档缺陷兜底：页面仍写 US/DE/SG，后端接收小写网关区域码
+          country: { enum: [US, DE, SG, us, de, sg, eu], description: 接入网关国家码（ISO 3166-1）：US=美国、DE=德国、SG=新加坡；支持小写国家码，保留旧区域码 eu（对应 DE）；创建后不能更换，不用于指定代理出口国家 }
           bandwidth_num: { type: integer, description: 带宽，单位 Mbps，10-1000 且为 10 的倍数 }
           remark: { description: 创建的子账号备注，可不传 }
   /externalapi/product_order/createTestOrder:
@@ -303,7 +303,7 @@ tools:
     drop: [is_renew] # 后端会把 is_renew 写回自动续费开关，由 src/renew.ts 沿用各子账号当前值，不交给模型
     params:
       timelen: { enum: [0, 1, 2, 3, 4], description: 续费时长：0=7天，1=30天，2=90天，3=180天，4=360天；数据中心（8）不能续 7 天，不能选 0 }
-      sub_account_ids: { description: 要续费的子账号 id，多个用英文逗号连接，一次最多 300 个 }
+      sub_account_ids: { description: 要续费的子账号 id，多个用英文逗号连接；去空格、去空值、去重后一次最多 300 个，每个账号只续费一次 }
       renew_with_bandwidth: { enum: [0, 1], description: 续费时是否包含带宽：1=按当前带宽续；0=不包含，续费期带宽按 5M 计价，当前带宽周期结束后回落到 5M。不传则沿用子账号当前的自动续费带宽设置；传了会同时改掉该设置 }
   /externalapi/product_order/createBandwidthUpgradeOrder:
     name: order_bandwidth_upgrade
