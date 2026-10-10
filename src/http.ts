@@ -16,6 +16,9 @@ export function cfgFromEnv(env: NodeJS.ProcessEnv = process.env): Cfg {
         '客户端拉起本服务时不继承终端里的环境变量，token 要写在客户端配置里（如 claude mcp add -e QQDL_TOKEN=…），用 Inspector 调试时通过 -e 传入。',
     );
   }
+  if (/[\x00-\x1f\x7f]/.test(token)) {
+    throw new Error('QQDL_TOKEN 格式不正确：不能包含控制字符，请重新复制 API Key。');
+  }
   const baseUrl = (env.QQDL_BASE_URL ?? 'https://admin.quanqiudaili.com').trim().replace(/\/+$/, '');
   const timeoutMs = Number(env.QQDL_TIMEOUT_MS ?? 30000);
   if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) throw new Error('QQDL_TIMEOUT_MS 必须是正整数（毫秒）');
@@ -48,6 +51,11 @@ export async function callApi(
   cfg: Cfg,
   fetchImpl: typeof fetch = fetch,
 ): Promise<CallToolResult> {
+  const redact = (value: string) => value
+    .replaceAll(JSON.stringify(cfg.token).slice(1, -1), '[已隐藏]')
+    .replaceAll(cfg.token, '[已隐藏]');
+  const fail = (message: string) => text(redact(message), true);
+
   // is_mcp_send 与 UA 让后端能区分 MCP 发出的请求
   const form = toForm({ ...args, ...tool.fixed, is_mcp_send: 1 }).toString();
   const url = new URL(cfg.baseUrl + tool.path);
@@ -68,20 +76,20 @@ export async function callApi(
     raw = await res.text();
   } catch (e) {
     const err = e as Error & { cause?: { message?: string } };
-    if (err.name === 'TimeoutError') return text(`请求 ${tool.path} 超过 ${cfg.timeoutMs} ms 未响应`, true);
+    if (err.name === 'TimeoutError') return fail(`请求 ${tool.path} 超过 ${cfg.timeoutMs} ms 未响应`);
     const cause = err.cause?.message ? `（${err.cause.message}）` : '';
-    return text(`请求 ${tool.path} 失败：${err.message}${cause}`, true);
+    return fail(`请求 ${tool.path} 失败：${err.message}${cause}`);
   }
 
   const body = parseBody(raw);
   const code = body ? Number(body.code) : NaN;
-  if (!body || !Number.isFinite(code)) return text(`HTTP ${status}，响应格式异常：${raw.slice(0, 200)}`, true);
+  if (!body || !Number.isFinite(code)) return fail(`HTTP ${status}，响应格式异常：${redact(raw).slice(0, 200)}`);
 
   const msg = String(body.msg ?? '');
   if (code === 1) return text(JSON.stringify({ code, msg, data: tool.pick ? pickField(body.data, tool.pick) : body.data ?? null }));
   if (code === 401 || code === 403 || status === 401) {
-    return text(`token 无效（${msg}）。API Key 永久有效，但可能被删除或复制不完整：到网站 API Keys 页面核对或重新生成，更新 QQDL_TOKEN 后重启本 MCP。`, true);
+    return fail(`token 无效（${msg}）。API Key 永久有效，但可能被删除或复制不完整：到网站 API Keys 页面核对或重新生成，更新 QQDL_TOKEN 后重启本 MCP。`);
   }
-  if (msg.includes('访问频繁')) return text(`${msg} 后端限流为每个接口每 IP 每分钟 180 次，请稍后重试。`, true);
-  return text(body.data == null ? msg : `${msg}\n${JSON.stringify(body.data)}`, true);
+  if (msg.includes('访问频繁')) return fail(`${msg} 后端限流为每个接口每 IP 每分钟 180 次，请稍后重试。`);
+  return fail(body.data == null ? msg : `${msg}\n${JSON.stringify(body.data)}`);
 }

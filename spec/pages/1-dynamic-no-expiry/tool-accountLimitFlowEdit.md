@@ -20,7 +20,7 @@ paths:
         - name: token
           in: header
           description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
-          required: false
+          required: true
           example: '{{access_token}}'
           schema:
             type: string
@@ -49,7 +49,7 @@ paths:
                   example: ''
                   type: string
                 timelen:
-                  description: 周期：0 天、1 周、2 月、3 季度、4 年；type=1 时有效，type=0 时忽略
+                  description: 周期：0=天、1=周、2=月、3=季度、4=年；type=1 时有效，type=0 时忽略
                   example: ''
                   type: string
               required:

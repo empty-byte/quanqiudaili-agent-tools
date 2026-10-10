@@ -13,14 +13,14 @@ paths:
     post:
       summary: 静态住宅（原生）申请退单
       deprecated: false
-      description: 静态住宅（原生）申请退单，不同订单的子账号列表退单请分开请求
+      description: 静态住宅（原生）申请退单，不同订单的子账号列表退单请分开请求。退单审核通过后，会删除或终止子账号，无法恢复。请您注意
       tags:
         - 用户IP子账号管理/静态住宅（原生）时长子账号
       parameters:
         - name: token
           in: header
           description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
-          required: false
+          required: true
           example: '{{access_token}}'
           schema:
             type: string

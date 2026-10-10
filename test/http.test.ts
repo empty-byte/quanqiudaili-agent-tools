@@ -31,6 +31,10 @@ describe('cfgFromEnv', () => {
     expect(() => cfgFromEnv({})).toThrow(/不继承终端/);
     expect(() => cfgFromEnv({})).toThrow(/-e QQDL_TOKEN/);
   });
+  it.each(['\n', '\r', '\t', '\0', '\x1f', '\x7f'])('拒绝 token 内部控制字符 %j，错误不回显 Key', control => {
+    expect(() => cfgFromEnv({ QQDL_TOKEN: `sk-private${control}secret` }))
+      .toThrow(/^QQDL_TOKEN 格式不正确：不能包含控制字符，请重新复制 API Key。$/);
+  });
 });
 
 describe('callApi', () => {
@@ -128,6 +132,67 @@ describe('callApi', () => {
     const r = await callApi(tool(), {}, cfg, boom);
     expect(textOf(r)).toContain('fetch failed');
     expect(textOf(r)).toContain('ECONNREFUSED 127.0.0.1:9');
+  });
+
+  it('请求头校验异常不回显包含换行的 Key', async () => {
+    const invalidCfg = { ...cfg, token: 'sk-private\nsecret' };
+    const validateRequest = (async (url, init) => {
+      new Request(url, init);
+      return new Response('{"code":1}');
+    }) as typeof fetch;
+    const r = await callApi(tool(), {}, invalidCfg, validateRequest);
+    expect(r.isError).toBe(true);
+    expect(textOf(r)).toContain('[已隐藏]');
+    expect(textOf(r)).not.toContain('sk-private');
+    expect(textOf(r)).not.toContain('secret');
+  });
+
+  it('网络异常与底层原因里的 Key 全部遮罩，保留诊断信息', async () => {
+    const secretCfg = { ...cfg, token: 'sk-private-secret' };
+    const boom = (async () => {
+      throw new Error(`fetch failed: ${secretCfg.token} ${secretCfg.token}`, {
+        cause: new Error(`ECONNREFUSED: ${secretCfg.token}`),
+      });
+    }) as typeof fetch;
+    const r = await callApi(tool(), {}, secretCfg, boom);
+    expect(r.isError).toBe(true);
+    expect(textOf(r)).not.toContain(secretCfg.token);
+    expect(textOf(r)).toContain('fetch failed');
+    expect(textOf(r)).toContain('ECONNREFUSED');
+  });
+
+  it.each([
+    [401, '{"code":401,"msg":"无效的 sk-private-secret"}'],
+    [200, '{"code":0,"msg":"sk-private-secret","data":{"token":"sk-private-secret"}}'],
+    [200, '{"code":0,"msg":"访问频繁 sk-private-secret"}'],
+    [502, '<html>sk-private-secret</html>'],
+    [502, '{"error":"sk-private-secret"}'],
+  ])('后端错误 HTTP %i 不回显 Key：%s', async (status, body) => {
+    const secretCfg = { ...cfg, token: 'sk-private-secret' };
+    const r = await callApi(tool(), {}, secretCfg, stub(status, body));
+    expect(r.isError).toBe(true);
+    expect(textOf(r)).not.toContain(secretCfg.token);
+    expect(textOf(r)).toContain('[已隐藏]');
+  });
+
+  it('业务错误数据里的 JSON 转义 Key 也会被遮罩', async () => {
+    const secretCfg = { ...cfg, token: 'sk-private"\\secret' };
+    const body = JSON.stringify({ code: 0, msg: '请求失败', data: { token: secretCfg.token } });
+    const r = await callApi(tool(), {}, secretCfg, stub(200, body));
+    expect(r.isError).toBe(true);
+    expect(textOf(r)).toContain('请求失败');
+    expect(textOf(r)).toContain('[已隐藏]');
+    expect(textOf(r)).not.toContain('sk-private');
+    expect(textOf(r)).not.toContain('secret');
+  });
+
+  it('格式异常正文先遮罩再截取，避免留下被截断的 Key', async () => {
+    const secretCfg = { ...cfg, token: 'sk-private-secret' };
+    const body = `${'x'.repeat(195)}${secretCfg.token}`;
+    const r = await callApi(tool(), {}, secretCfg, stub(502, body));
+    expect(r.isError).toBe(true);
+    expect(textOf(r)).toContain('[已隐藏]');
+    expect(textOf(r)).not.toContain('sk-pr');
   });
 
   it('超时时说明超过了多少毫秒', async () => {

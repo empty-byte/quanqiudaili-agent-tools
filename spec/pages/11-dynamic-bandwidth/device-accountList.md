@@ -1,4 +1,4 @@
-# 获取动态住宅不限流量子账号列表
+# 获取动态住宅不限流量子账号列表 
 
 ## OpenAPI Specification
 
@@ -69,7 +69,7 @@ paths:
         - name: token
           in: header
           description: 用户api key。<a href="/9518262m0" target="_blank">api key获取方式</a>
-          required: false
+          required: true
           example: '{{access_token}}'
           schema:
             type: string
