@@ -28,7 +28,7 @@ git --version
 
 ## 2. 获取 API Key
 
-登录全球代理网站，进入 **API Keys** 页面，新建并复制一个 API Key。获取方式见[官方说明](https://develop.quanqiudaili.com/9518262m0.md)。
+登录全球代理网站，进入 **API Keys** 页面，新建并复制一个 API Key。获取方式见[官方说明](https://develop.quanqiudaili.com/9518262m0)。
 
 将下面示例中的 `YOUR_API_KEY` 替换为自己的 Key。它应填入客户端配置的 `QQDL_TOKEN`，不需要把网站登录密码交给 AI。
 
