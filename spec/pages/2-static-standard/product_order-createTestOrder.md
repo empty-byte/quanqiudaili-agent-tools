@@ -284,7 +284,7 @@ paths:
                     data:
                       orderProductBuy:
                         user_id: 77
-                        order_number: 20250820132733kNewGL
+                        order_number: 2025082013xxxxxxx
                         description: 【独享静态住宅（非原生）】，国家/地区：US，城市：，数量：1
                         pay_gateway: 3
                         order_status: 2
@@ -316,7 +316,7 @@ paths:
                           changeInterval: 0
                           expiresIn: 1755926851
                           expiresDate: '2025-08-23 13:27:31'
-                          ip: 96.62.48.237
+                          ip: 127.0.0.1
                           bill: '0.00'
                           is_diff: 0
                           country: US
