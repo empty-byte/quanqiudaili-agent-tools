@@ -116,15 +116,15 @@ paths:
                 data:
                   list:
                     - downstreamTraffic: 0
-                      exitPortIP: 96.62.135.150
-                      subAccount: '69607'
+                      exitPortIP: xx.xx.xx.xx
+                      subAccount: '1'
                       upstreamTraffic: 0
-                      bindUser: zhizhuipsrt-69607
+                      bindUser: xxx-xx
                     - downstreamTraffic: 0
-                      exitPortIP: 89.42.40.173
-                      subAccount: '69606'
+                      exitPortIP: xx.xx.xx.xx
+                      subAccount: '1'
                       upstreamTraffic: 0
-                      bindUser: zhizhuipsrt-69606
+                      bindUser: xxx-xx
                   total: 2
           headers: {}
           x-apifox-name: 成功

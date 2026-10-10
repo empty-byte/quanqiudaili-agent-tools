@@ -197,7 +197,7 @@ paths:
                     is_bind: 否
                     bindUser: test
                     disabled: 0
-                    bindPassword: z4b8zhwl
+                    bindPassword: test
                     createTime: '2025-07-17 18:06:03'
                     port: 5001
                     agree: SOCKS5

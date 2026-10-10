@@ -149,20 +149,20 @@ paths:
                 time: '1755159010'
                 data:
                   list:
-                    - sub_account: 65591
+                    - sub_account: 1
                       original_bandwidth_num: 5
                       bandwidth_num: '11'
-                      username: zhizhuipsrt-65591
+                      username: xxxx-xxxx
                       current_set_meal_name: 基础性
                       upgrade_set_meal_name: 标准型
                       days: 19
                       money: '57.00'
                       bandwidth_price_settings_id: 99
                       set_meal_bandwidth_id: 2
-                    - sub_account: 65592
+                    - sub_account: 2
                       original_bandwidth_num: 5
                       bandwidth_num: '11'
-                      username: zhizhuipsrt-65592
+                      username: xxxx-xxxx
                       current_set_meal_name: 基础性
                       upgrade_set_meal_name: 标准型
                       days: 19

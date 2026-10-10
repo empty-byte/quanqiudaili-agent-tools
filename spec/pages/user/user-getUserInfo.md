@@ -215,15 +215,15 @@ paths:
                   realName: xxx
                   nextLevel: 2
                   nextLevelStartPoint: 100001
-                  withdrawalAmount: 393.6
+                  withdrawalAmount: 0
                   last3WithdrawalAmount: 0
-                  id: 77
+                  id: 1
                   username: xxx
                   nickname: xxx
                   email: xxx@xxx.com
                   mobile: xxxxxx
                   avatar: https://admin.quanqiudaili.com/xxxxxxxx
-                  money: '418.91'
+                  money: '0'
                   mobile_verify: 1
                   email_verify: 1
                   auth_verify: 1
@@ -231,8 +231,8 @@ paths:
                   fid: 0
                   ref_level1_user_id: 0
                   ref_level2_user_id: 0
-                  valid_point: 331
-                  history_total_point: 331
+                  valid_point: 0
+                  history_total_point: 0
                   promote_valid_date: '2028-01-25 00:00:00'
                   level: 1
                   ref: xxxx
@@ -244,8 +244,8 @@ paths:
                   password_type: 1
                   isCustomerServiceSet: 1
                   promotionCode: xxxxxx
-                  unreadMessageCount: 38
-                  todoListCount: 119
+                  unreadMessageCount: 0
+                  todoListCount: 0
           headers: {}
           x-apifox-name: 成功
       security: []
