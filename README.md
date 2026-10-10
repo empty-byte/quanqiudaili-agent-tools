@@ -191,7 +191,7 @@ npm run sync-docs    # 从文档站重新生成工具定义，并打印与上一
 npm run build-spec   # 仅用本地已下载的文档页重新生成工具定义
 ```
 
-工具定义由 <https://develop.quanqiudaili.com/llms.txt> 生成，不手写；工具名、描述与文档修正维护在 `spec/overrides.yaml`。涉及在后端创建数据的操作不做自动化联调，由维护者用测试账号手动验证。设计与实施文档见 `docs/`。
+工具定义由 <https://develop.quanqiudaili.com/llms.txt> 生成，不手写；工具名、描述与文档修正维护在 `spec/overrides.yaml`。涉及在后端创建数据的操作不做自动化联调，由维护者用测试账号手动验证。
 
 ## 许可
 

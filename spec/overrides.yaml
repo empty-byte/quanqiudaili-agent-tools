@@ -212,7 +212,7 @@ tools:
     params: # 文档没有给 type、timelen 枚举，类型也不统一
       id: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
       type: { type: integer, enum: [0, 1], description: 限流类型：0 = 永久，按子账号累计用量（默认）；1 = 周期 }
-      timelen: { type: integer, enum: [0, 1, 2, 4], description: 周期：0 天、1 周、2 月、4 年；type=1 时应传，不传按天；type=0 时忽略 } # 季度（3）后端算不对周期起点，会退化成永久限流，不开放
+      timelen: { type: integer, enum: [0, 1, 2, 4], description: 周期：0 天、1 周、2 月、4 年；type=1 时应传，不传按天；type=0 时忽略 } 
   /externalapi/device/accountDelete:
     name: sub_account_delete
     title: 删除单个子账号

@@ -267,14 +267,14 @@ paths:
                       country: US
                       target: proxy.quanqiudaili.com
                       port: 5001
-                      username: gp60077sctisp-1
-                      password: skywxku2
+                      username: xxxxxx-1
+                      password: xxxxx
                       is_bind: '0'
                       remark: ''
                       poolStatus: online
-                      bindUser: gp60077sctisp-1
-                      bindPassword: skywxku2
-                      ip: 207.180.30.78
+                      bindUser: xxxxxx-1
+                      bindPassword: xxxxx
+                      ip: 207.1xx80.xx.xx
                       countdown: 30.0天
                       expiresIn: 1793084710
                       createtime: '2026-09-27 15:05:11'
