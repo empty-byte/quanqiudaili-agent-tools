@@ -186,7 +186,7 @@ tools:
     description: 修改单个子账号的备注。
     params:
       id: { type: string, description: 子账号 id，取 sub_account_list 返回的 id 字段 }
-      remark: { required: true, description: 新备注，传空串会清空备注 } # remark 必填，不允许空串
+      remark: { required: true, description: 新备注，传空串会清空备注 } # remark 必填，必须传入 remark
   /externalapi/device/accountUpdateList:
     name: sub_account_update_batch
     title: 批量修改子账号备注
