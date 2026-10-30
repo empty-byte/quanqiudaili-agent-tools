@@ -38,11 +38,13 @@ describe('spec/tools.json', () => {
     for (const t of tools.filter(x => x.destructive)) expect(t.description, t.name).toMatch(/^(会从账户余额|不可恢复|审核通过后会删除并终止子账号，不可恢复。)/);
   });
 
-  it('购买接口按产品拆成三个工具，旧流量与时长产品保留原契约', () => {
+  it('购买接口按产品拆成三个工具，动态流量按阶梯价范围校验', () => {
     const dyn = byName('order_buy_dynamic');
     expect(dyn.inputSchema.properties.product_type_id.enum).toEqual([1, 6]);
     expect(Object.keys(dyn.inputSchema.properties).sort()).toEqual(['bill_timelen', 'num', 'product_type_id']);
     expect(dyn.inputSchema.required).toEqual(['product_type_id', 'num']);
+    expect(dyn.inputSchema.properties.num).toMatchObject({ type: 'integer', minimum: 1, maximum: 5000 });
+    expect(dyn.inputSchema.properties.bill_timelen.enum).toEqual([1]);
 
     const ip = byName('order_buy_time_ip');
     expect(ip.inputSchema.properties.product_type_id.enum).toEqual([2, 3, 4, 8]);
@@ -56,15 +58,41 @@ describe('spec/tools.json', () => {
 
     const bandwidth = byName('order_buy_dynamic_bandwidth');
     expect(bandwidth.path).toBe('/externalapi/product_order/createProductBuyOrder');
-    expect(Object.keys(bandwidth.inputSchema.properties).sort()).toEqual(['bandwidth_num', 'bill_timelen', 'country', 'product_type_id', 'remark']);
+    expect(Object.keys(bandwidth.inputSchema.properties).sort()).toEqual(['bandwidth_num', 'bill_timelen', 'country', 'product_type_id', 'remark', 'user_conpon_id']);
     expect([...bandwidth.inputSchema.required].sort()).toEqual(['bandwidth_num', 'bill_timelen', 'country', 'product_type_id']);
     expect(bandwidth.inputSchema.properties).toMatchObject({
       product_type_id: { type: 'integer', enum: [11] },
       bill_timelen: { type: 'integer', enum: [1, 2, 3] },
       country: { type: 'string', enum: ['US', 'DE', 'SG', 'us', 'de', 'sg', 'eu'] },
-      bandwidth_num: { type: 'integer' },
+      bandwidth_num: { type: 'integer', minimum: 10, maximum: 1000, multipleOf: 10 },
       remark: { type: 'string' },
+      user_conpon_id: { type: 'string' },
     });
+  });
+
+  it('产品报价保留无参查询，产品 11 新购与续费按条件传参', () => {
+    const quote = byName('product_unit_price');
+    expect(quote.readOnly).toBe(true);
+    expect(quote.method).toBe('GET');
+    expect(quote.inputSchema.required).toEqual([]);
+    expect(quote.inputSchema.properties).toMatchObject({
+      product_type_id: { type: 'integer', enum: [11] },
+      country: { enum: ['US', 'DE', 'SG', 'us', 'de', 'sg'] },
+      bandwidth_num: { type: 'integer', minimum: 10, maximum: 1000, multipleOf: 10 },
+      bill_timelen: { enum: [1, 2, 3] },
+      sub_account_id: { type: 'string' },
+      user_conpon_id: { type: 'string' },
+    });
+    expect(quote.inputSchema.anyOf).toEqual([
+      { maxProperties: 0 },
+      { required: ['product_type_id', 'country', 'bandwidth_num', 'bill_timelen'], not: { required: ['sub_account_id'] } },
+      { required: ['product_type_id', 'sub_account_id', 'bill_timelen'], not: { anyOf: [{ required: ['country'] }, { required: ['bandwidth_num'] }] } },
+    ]);
+    const upgrade = byName('bandwidth_upgrade_price');
+    expect(upgrade.inputSchema.properties.product_type_id.enum).toEqual([2, 3, 4, 8, 11]);
+    expect(upgrade.inputSchema.properties.sub_account_id.type).toBe('string');
+    expect([...upgrade.inputSchema.required].sort()).toEqual(['bandwidth_num', 'product_type_id']);
+    expect(upgrade.inputSchema.anyOf).toHaveLength(2);
   });
 
   it('动态带宽续费与升级使用本地 sub_account_id，并保留各自参数契约', () => {

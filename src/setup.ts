@@ -3,13 +3,13 @@ export interface SetupOptions {
   indexPath: string;
   token?: string;
   readonly: boolean;
-  /** 用 npx -y 从 GitHub 拉起，不依赖本机安装位置；npm 上尚未发布，发了之后把 PACKAGE 换成包名即可 */
+  /** 用 npx -y 从 GitHub 拉起，不依赖本机源码目录。 */
   npx?: boolean;
   platform: NodeJS.Platform;
 }
 
 const NAME = 'quanqiudaili';
-const PACKAGE = 'github:empty-byte/quanqiudaili-mcp';
+const PACKAGE = 'github:empty-byte/quanqiudaili-agent-tools';
 
 /** 生成各客户端可直接粘贴的配置片段，只产出文本，不碰任何文件 */
 export function renderSetup(o: SetupOptions): string {
@@ -32,11 +32,11 @@ export function renderSetup(o: SetupOptions): string {
   const windsurfPath = win ? '%APPDATA%\\devin\\mcp_config.json' : '~/.config/devin/mcp_config.json';
 
   return [
-    `quanqiudaili-mcp 客户端配置片段${o.readonly ? '（只读模式）' : '（全部工具）'}`,
+    `quanqiudaili-agent-tools MCP 客户端配置片段${o.readonly ? '（只读模式）' : '（全部工具）'}`,
     '',
     `服务名 ${NAME}；命令 ${command}；参数 ${JSON.stringify(args)}；环境变量 QQDL_TOKEN。`,
     ...(o.token ? [] : ['下面所有片段里请把 你的token 换成网站 API Keys 页面生成的 API Key，做法见 README。']),
-    'token 必须写在客户端配置里，终端里设置的环境变量不会传给客户端拉起的子进程。改完配置后重启对应客户端。',
+    '请把 QQDL_TOKEN 写在客户端配置里；客户端可能无法继承另一个终端的环境变量。改完配置后重启对应客户端。',
     '',
     '== Claude Code ==',
     `claude mcp add -s user -e QQDL_TOKEN=${token} ${NAME} -- ${cli}`,

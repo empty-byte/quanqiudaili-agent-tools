@@ -13,6 +13,10 @@ export interface ToolOverride {
   fixed?: Record<string, string | number>;
   drop?: string[];
   params?: Record<string, ParamOverride>;
+  /** 后端已有、文档尚未收录的顶层参数；文档补齐后移入 params。 */
+  addParams?: Record<string, ParamOverride>;
+  /** 同一接口不同调用方式的条件必填与互斥约束。 */
+  variants?: JsonSchema[];
 }
 export interface SplitPart extends ToolOverride { productTypeIds?: number[]; tags?: string[] }
 /** 从已有工具派生、只取响应 data 里一个字段的工具，如账户余额只取 user_info 的 money */
@@ -196,7 +200,17 @@ export function mergeGroup(pages: Page[], ov: ToolOverride): ToolDef {
     }
   }
 
-  // 2. 参数级 overrides
+  // 2. 显式补入文档缺失参数，普通 params 仍拒绝未知名称，避免拼写错误被静默接受。
+  for (const [name, o] of Object.entries(ov.addParams ?? {})) {
+    if (name.includes('[') || props[name]) throw new Error(`${ov.name}: addParams 参数 ${name} 必须是文档中不存在的顶层参数，文档补齐后请移入 params`);
+    const { required, ...schema } = o;
+    props[name] = structuredClone(schema);
+    const t = getTrack(track, name);
+    t.seenIn = new Set(pageKeys);
+    if (required) t.requiredIn = new Set(pageKeys);
+  }
+
+  // 3. 参数级 overrides。
   for (const [rawName, o] of Object.entries(ov.params ?? {})) {
     const [base, ...segs] = tokens(rawName);
     const node = locate(root, base, segs);
@@ -210,27 +224,28 @@ export function mergeGroup(pages: Page[], ov: ToolOverride): ToolDef {
     }
   }
 
-  // 3. product_type_id：整数、必填、枚举与中文标签
+  // 4. 产品类型默认必填；全产品查询入口可显式声明可选，并保留其分支说明。
   const pid = props.product_type_id;
   if (pid) {
     pid.type = 'integer';
     const derived = pages.every(p => p.productTypeId !== undefined)
       ? [...new Set(pages.map(p => p.productTypeId as number))].sort((a, b) => a - b)
       : undefined;
-    const en = (ov.params?.product_type_id?.enum as number[] | undefined) ?? derived;
+    const productOverride = ov.params?.product_type_id ?? ov.addParams?.product_type_id;
+    const en = (productOverride?.enum as number[] | undefined) ?? derived;
     if (en) pid.enum = en;
     else delete pid.enum;
-    pid.description = '产品类型：' + (en ?? ALL_PRODUCTS).map(id => `${id}=${PRODUCT_LABELS[id] ?? id}`).join('，');
-    getTrack(track, 'product_type_id').requiredIn = new Set(pageKeys);
+    pid.description = productOverride?.description ?? '产品类型：' + (en ?? ALL_PRODUCTS).map(id => `${id}=${PRODUCT_LABELS[id] ?? id}`).join('，');
+    getTrack(track, 'product_type_id').requiredIn = new Set(productOverride?.required === false ? [] : pageKeys);
   }
 
-  // 4. 通用描述补充
+  // 5. 通用描述补充。
   for (const [name, s] of Object.entries(props)) {
     if ((name === 'country' || name === 'country_code') && !/ISO/.test(s.description ?? '')) appendNote(s, '国家用 ISO 3166-1 二字码，如 US');
     if (name === 'pagesize' && !/100/.test(s.description ?? '')) s.description = `${s.description ?? '每页数量'}，最大 100`;
   }
 
-  // 5. 必填：顶层要在全部变体都必填；部分必填写进描述
+  // 6. 必填：顶层要在全部变体都必填；部分必填写进描述。
   const numericKeys = pageKeys.every(k => /^\d+$/.test(k));
   const required: string[] = [];
   for (const [name, s] of Object.entries(props)) {
@@ -249,7 +264,7 @@ export function mergeGroup(pages: Page[], ov: ToolOverride): ToolDef {
     method: ov.readOnly ? 'GET' : 'POST',
     path: pages[0].path,
     ...(ov.fixed ? { fixed: ov.fixed } : {}),
-    inputSchema: { type: 'object', properties: props, required, additionalProperties: false },
+    inputSchema: { type: 'object', properties: props, required, additionalProperties: false, ...(ov.variants ? { anyOf: ov.variants } : {}) },
   };
 }
 

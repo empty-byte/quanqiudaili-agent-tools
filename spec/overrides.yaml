@@ -23,8 +23,22 @@ tools:
   /externalapi/product_price/getProductUnitPrice:
     name: product_unit_price
     title: 产品单价
-    description: 查询当前账号各产品的单价和按国家的自定义价。data 按产品 ID 分组：产品 1 单档；产品 6 按 30/90/180 天三档；时长类产品按 7/30/90/180/360 天档位。每档返回 originUnitPrice（平台原价）、userUnitPrice（用户单价）、isCustom（是否设置了自定义价）；customPriceBalance 是自定义价额度。data 里还会出现产品 7（动态次数），可忽略。
+    description: 不传参数时查询当前账号各产品的单价和自定义价额度。动态流量产品 1/6 按购买 GB 数匹配 flowPriceBoard 的 tiers（min_gb/max_gb），origin_price/custom_price 是元/GB；custom_price 为空时用官网价，优惠价是否生效还受额度影响，不能用首档价计算所有数量；产品 6 固定 30 天。时长类按 7/30/90/180/360 天返回 originUnitPrice/userUnitPrice，customPriceBalance 是自定义价额度，产品 7 可忽略。传 product_type_id=11 时只读试算动态不限流量的新购或续费：新购传 country、bandwidth_num、bill_timelen；续费传本地 sub_account_id、bill_timelen，沿用账号网关和带宽。realPrice 是预计总金额，单位元；续费另返回 new_expire_time。不锁价、不占库存或优惠额度，实际扣费以下单为准。
     readOnly: true
+    # 文档缺陷兜底：后端已支持产品 11 报价，原始价格页仍无参数；文档补齐后移入 params。
+    addParams:
+      product_type_id: { type: integer, enum: [11], required: false, description: 仅产品 11 报价时传 11；省略且不传其他参数时查询原有产品单价表。 }
+      country: { type: string, enum: [US, DE, SG, us, de, sg], description: 新购报价必填的接入网关国家码（ISO 3166-1）；旧区域 eu 请改用 DE，不用于指定代理出口国家；续费不传。 }
+      bandwidth_num: { type: integer, minimum: 10, maximum: 1000, multipleOf: 10, description: 新购报价必填的带宽，单位 Mbps，10-1000 且为 10 的倍数；续费沿用当前带宽，不传。 }
+      bill_timelen: { type: integer, enum: [1, 2, 3], description: 产品 11 报价必填的周期，1=30天、2=90天、3=180天。 }
+      sub_account_id: { type: string, pattern: '^[1-9][0-9]*$', description: 续费报价时传本地子账号 ID，取产品 11 列表的 sub_account_id；不要传 Go id。省略时为新购报价。 }
+      user_conpon_id: { type: string, pattern: '^[0-9]+$', description: 可选优惠券 ID，省略或 0 表示不用券；报价和下单使用同一张券，自定义价不与券叠加。 }
+    variants:
+      - { maxProperties: 0 }
+      - required: [product_type_id, country, bandwidth_num, bill_timelen]
+        not: { required: [sub_account_id] }
+      - required: [product_type_id, sub_account_id, bill_timelen]
+        not: { anyOf: [{ required: [country] }, { required: [bandwidth_num] }] }
   /externalapi/conpons/getProductList:
     name: product_list
     title: 产品信息
@@ -161,13 +175,24 @@ tools:
   /externalapi/product_price/bandwidthUpgradePrice:
     name: bandwidth_upgrade_price
     title: 带宽升级价格试算
-    description: 计算为子账号升级带宽需要的费用，不下单、不扣费。下单请用 order_bandwidth_upgrade；试算不检查"所有子账号同一国家"和"单次最多 300 个"，下单时会检查。不属于本人或产品不符的子账号会被静默跳过。
+    description: 只读试算子账号带宽升级费用，不下单、不扣费、不锁价或占用带宽。时长类产品传 sub_accounts 数组，下单用 order_bandwidth_upgrade；试算不检查同一国家和单次最多 300 个，不属于本人或产品不符的账号会被静默跳过，须核对试算对象。产品 11 只传本地 sub_account_id，返回 realPrice 总差价及 list 中的原带宽、目标带宽、剩余天数和到期时间，下单用 order_upgrade_dynamic_bandwidth。
     readOnly: true
     params:
-      product_type_id: { enum: [2, 3, 4, 8] }
-      sub_accounts: { description: 要升级带宽的子账号 id 列表，取 sub_account_list 返回的 id 字段 }
-      "sub_accounts[]": { required: true }
-      bandwidth_num: { type: integer, required: true, description: 目标带宽，必须是 bandwidth_package_list 返回的某个档位的 num，且大于子账号当前及续费后尚未开始的各段带宽 }
+      product_type_id: { enum: [2, 3, 4, 8, 11] }
+      sub_accounts: { required: false, minItems: 1, description: 时长类产品必填的子账号 id 数组，取 sub_account_list 返回的 id；产品 11 不传。 }
+      "sub_accounts[]": { required: false }
+      bandwidth_num: { type: integer, required: true, description: 目标带宽。时长类填 bandwidth_package_list 返回的 num，且大于当前及未来各段带宽；产品 11 为 10-1000 Mbps、10 的倍数，必须高于当前带宽。 }
+    # 文档缺陷兜底：产品 11 升级报价使用本地 ID；文档补齐后移入 params。
+    addParams:
+      sub_account_id: { type: string, pattern: '^[1-9][0-9]*$', description: 产品 11 必填的本地子账号 ID，取列表 sub_account_id，不是 Go id；时长类产品不传。 }
+    variants:
+      - required: [sub_accounts]
+        not: { anyOf: [{ required: [sub_account_id] }, { properties: { product_type_id: { enum: [11] } } }] }
+      - required: [sub_account_id]
+        properties:
+          product_type_id: { enum: [11] }
+          bandwidth_num: { minimum: 10, maximum: 1000, multipleOf: 10 }
+        not: { required: [sub_accounts] }
 
   # ===== 写操作（默认模式才暴露）=====
   /externalapi/device/accountAdd:
@@ -190,7 +215,7 @@ tools:
   /externalapi/device/accountUpdateList:
     name: sub_account_update_batch
     title: 批量修改子账号备注
-    description: 批量修改多个子账号的备注，ids 为逗号分隔的子账号 id，单次最多 200 个（超过会失败）。
+    description: 批量修改动态流量产品（1/6）子账号的备注，ids 为逗号分隔的子账号 id，建议每次最多 200 个。超过 200 个时后端进入异步队列，返回已加入队列或正在处理不代表修改完成，应稍后查询结果，不能重复提交。
   /externalapi/device/batchUpdateSubAccountUsernamePassword:
     name: sub_account_set_credentials
     title: 自定义子账号账密
@@ -230,10 +255,11 @@ tools:
       - name: order_buy_dynamic
         productTypeIds: [1, 6]
         title: 购买动态住宅流量
-        description: 会从账户余额扣费。购买动态住宅流量，num 为 GB 数（1-300，要买更多请分几次下单）：产品 1 不限时长；产品 6 为包月，一次性加 num GB，有效期由 bill_timelen 决定，到期没用完的流量会被扣掉。下单前先用 product_unit_price 查价、user_balance 查余额，并向用户确认。
+        description: 会从账户余额扣费。购买动态住宅流量，num 为整数 GB 数，单次 1-5000，更大用量请联系客服；按本次购买量命中阶梯价，不要为沿用旧 300GB 限制自动拆单。产品 1 不限时长；产品 6 固定 30 天，到期没用完的流量会被扣掉。下单前用 product_unit_price 返回的 flowPriceBoard 匹配档位、user_balance 查余额，说明优惠额度与实际扣费边界并向用户确认。
         destructive: true
         params:
-          bill_timelen: { enum: [1, 2, 3], description: 包月有效时长：1=30天，2=90天，3=180天；产品 6 必填，产品 1 忽略 }
+          num: { type: integer, minimum: 1, maximum: 5000, description: 购买流量，单位 GB，单次整数 1-5000；按整单数量命中阶梯单价，不按旧 300GB 限制拆单。 }
+          bill_timelen: { required: false, enum: [1], description: 产品 6 固定 30 天，省略时默认 1，也可显式传 1；产品 1 忽略。 }
       - name: order_buy_time_ip
         productTypeIds: [2, 3, 4, 8]
         tags:
@@ -259,14 +285,17 @@ tools:
       - name: order_buy_dynamic_bandwidth
         tags: [用户IP子账号管理/动态住宅不限流量]
         title: 购买动态住宅不限流量
-        description: 会从账户余额扣费。购买按带宽计费的动态不限流量（产品 11），每次创建一个子账号并立即发货；按网关区域、带宽和 30/90/180 天计费，创建后不能更换网关。现有价格查询工具不返回本产品报价，实际扣费以后端计算为准。
+        description: 会从账户余额扣费。购买按带宽计费的动态不限流量（产品 11），每次创建一个子账号并立即发货；按网关、带宽和 30/90/180 天计费，创建后不能更换网关。先用 product_unit_price 传 product_type_id=11 和同样的网关、带宽、周期试算，实际扣费以下单为准；报价不保证库存充足。
         destructive: true
         params:
           product_type_id: { enum: [11] }
           bill_timelen: { type: integer, enum: [1, 2, 3], description: 购买时长：1=30天，2=90天，3=180天 }
           country: { enum: [US, DE, SG, us, de, sg, eu], description: 接入网关国家码（ISO 3166-1）：US=美国、DE=德国、SG=新加坡；支持小写国家码，保留旧区域码 eu（对应 DE）；创建后不能更换，不用于指定代理出口国家 }
-          bandwidth_num: { type: integer, description: 带宽，单位 Mbps，10-1000 且为 10 的倍数 }
+          bandwidth_num: { type: integer, minimum: 10, maximum: 1000, multipleOf: 10, description: 带宽，单位 Mbps，10-1000 且为 10 的倍数。 }
           remark: { description: 创建的子账号备注，可不传 }
+        # 文档缺陷兜底：后端新购已读取优惠券；文档补齐后移入 params。
+        addParams:
+          user_conpon_id: { type: string, pattern: '^[0-9]+$', description: 可选优惠券 ID，省略或 0 表示不用券；与报价传相同值，自定义价不与券叠加。 }
   /externalapi/product_order/createTestOrder:
     name: order_buy_test_ip
     title: 购买时长测试 IP
@@ -281,7 +310,7 @@ tools:
   /externalapi/product_order/createBandwidthRenewOrder:
     name: order_renew_dynamic_bandwidth
     title: 续费动态住宅不限流量
-    description: 会从账户余额扣费。为动态不限流量子账号续费，按当前带宽和网关当前价计费，不改变带宽；未到期从原到期时间延长，已到期从当前时间起算，到期后 7 天内可续费。赠送测试账号或有待审核退单申请的账号不能续费；不支持自动续费。现有价格查询工具不返回本产品报价，实际扣费以后端计算为准。
+    description: 会从账户余额扣费。为动态不限流量子账号续费，按当前带宽和网关当前价计费，不改变带宽；未到期从原到期时间延长，已到期从当前时间起算，到期后 7 天内可续费。赠送测试账号或有待审核退单申请的账号不能续费；不支持自动续费。先用 product_unit_price 传 product_type_id=11、本地 sub_account_id 和同样周期试算，实际扣费以下单为准。
     destructive: true
     params:
       sub_account_id: { type: string, description: 本地子账号 ID，必须取 sub_account_list 产品 11 返回的 sub_account_id，不是 id 字段 }
@@ -290,11 +319,11 @@ tools:
   /externalapi/product_order/createBandwidthUpgradeOrderForDrfbw:
     name: order_upgrade_dynamic_bandwidth
     title: 升级动态住宅不限流量带宽
-    description: 会从账户余额扣费。立即提高动态不限流量子账号的带宽，只升不降，到期时间不变；仅限未到期正式子账号。差价按新档月总价减原成交月总价，再乘剩余天数除以 30；剩余天数向上取整，不足一天按一天。不支持优惠券，现有带宽试算工具仅适用于时长类产品，实际扣费以后端计算为准。
+    description: 会从账户余额扣费。立即提高动态不限流量子账号的带宽，只升不降，到期时间不变；仅限未到期正式子账号。差价按新档月总价减原成交月总价，再乘剩余天数除以 30；剩余天数向上取整，不足一天按一天。不支持优惠券；先用 bandwidth_upgrade_price 传 product_type_id=11、本地 sub_account_id 和同样目标带宽试算，实际扣费以下单为准。
     destructive: true
     params:
       sub_account_id: { type: string, description: 本地子账号 ID，必须取 sub_account_list 产品 11 返回的 sub_account_id，不是 id 字段 }
-      bandwidth_num: { type: integer, description: 目标带宽，单位 Mbps，必须大于当前带宽，10-1000 且为 10 的倍数 }
+      bandwidth_num: { type: integer, minimum: 10, maximum: 1000, multipleOf: 10, description: 目标带宽，单位 Mbps，必须大于当前带宽，10-1000 且为 10 的倍数。 }
   /externalapi/product_order/createRenewProductBuyOrder:
     name: order_renew
     title: 续费时长 IP

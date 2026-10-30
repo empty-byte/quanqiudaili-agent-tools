@@ -93,6 +93,34 @@ describe('mergeGroup', () => {
   it('overrides 引用文档里不存在的参数时报错', () => {
     expect(() => mergeGroup([page('a', '/p', 1, [])], ov('x', { params: { nope: { type: 'integer' } } }))).toThrow(/nope/);
   });
+
+  it('显式补充文档缺失参数，产品筛选可选且保留条件必填', () => {
+    const variants = [{ maxProperties: 0 }, { required: ['product_type_id', 'sub_account_id'] }];
+    const t = mergeGroup([page('a', '/p', undefined, [])], ov('quote', {
+      addParams: {
+        product_type_id: { type: 'integer', enum: [11], required: false, description: '省略时查询全部单价。' },
+        sub_account_id: { type: 'string', pattern: '^[1-9][0-9]*$' },
+      },
+      variants,
+    }));
+    expect(t.inputSchema.required).toEqual([]);
+    expect(t.inputSchema.properties.product_type_id).toEqual({ type: 'integer', enum: [11], description: '省略时查询全部单价。' });
+    expect(t.inputSchema.properties.sub_account_id).toEqual({ type: 'string', pattern: '^[1-9][0-9]*$' });
+    expect(t.inputSchema.anyOf).toEqual(variants);
+  });
+
+  it('文档已补齐的新增参数须迁移为普通覆盖，拒绝隐式覆盖与嵌套新增', () => {
+    expect(() => mergeGroup([page('a', '/p', undefined, [['id', true]])], ov('x', {
+      addParams: { id: { type: 'string' } },
+    }))).toThrow(/文档补齐后请移入 params/);
+    expect(() => mergeGroup([page('a', '/p', undefined, [])], ov('x', {
+      addParams: { 'content[0][id]': { type: 'string' } },
+    }))).toThrow(/顶层参数/);
+    const t = mergeGroup([page('a', '/p', undefined, [['product_type_id', true]])], ov('x', {
+      params: { product_type_id: { required: false, enum: [11] } },
+    }));
+    expect(t.inputSchema.required).toEqual([]);
+  });
 });
 
 describe('buildTools', () => {

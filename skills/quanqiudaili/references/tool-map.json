@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "workflows": [
+    {
+      "id": "purchase",
+      "reference": "products-and-purchase.md",
+      "tools": [
+        "product_list",
+        "user_info",
+        "user_balance",
+        "product_unit_price",
+        "static_country_list",
+        "static_city_list",
+        "static_ip_range_list",
+        "static_region_stock",
+        "stock_check",
+        "order_buy_dynamic",
+        "order_buy_time_ip",
+        "order_buy_test_ip",
+        "order_buy_dynamic_bandwidth"
+      ]
+    },
+    {
+      "id": "accounts",
+      "reference": "accounts-and-traffic.md",
+      "tools": [
+        "sub_account_list",
+        "sub_account_add",
+        "sub_account_update",
+        "sub_account_update_batch",
+        "sub_account_set_credentials",
+        "sub_account_toggle_direct",
+        "sub_account_flow_query",
+        "sub_account_limit_flow",
+        "sub_account_set_limit_flow"
+      ]
+    },
+    {
+      "id": "renewal",
+      "reference": "renew-and-bandwidth.md",
+      "tools": [
+        "order_renew",
+        "order_renew_dynamic_bandwidth",
+        "order_upgrade_dynamic_bandwidth",
+        "order_bandwidth_upgrade",
+        "bandwidth_upgrade_price",
+        "bandwidth_package_list",
+        "bandwidth_detail",
+        "bandwidth_monitoring_list",
+        "bandwidth_trend"
+      ]
+    },
+    {
+      "id": "removal",
+      "reference": "delete-and-refund.md",
+      "tools": [
+        "sub_account_delete",
+        "sub_account_delete_batch",
+        "order_refund_apply",
+        "order_refund_dynamic_bandwidth"
+      ]
+    },
+    {
+      "id": "connection",
+      "reference": "proxy-connections.md",
+      "tools": [
+        "dynamic_country_list",
+        "dynamic_state_list",
+        "dynamic_city_list"
+      ]
+    }
+  ]
+}

@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { renderSetup } from '../src/setup.js';
 
-const win = { indexPath: 'C:\\tools\\quanqiudaili-mcp\\dist\\src\\index.js', token: 'abc', readonly: false, platform: 'win32' as const };
-const args = ['C:/tools/quanqiudaili-mcp/dist/src/index.js'];
+const win = { indexPath: 'C:\\tools\\quanqiudaili-agent-tools\\dist\\src\\index.js', token: 'abc', readonly: false, platform: 'win32' as const };
+const args = ['C:/tools/quanqiudaili-agent-tools/dist/src/index.js'];
 const env = { QQDL_TOKEN: 'abc' };
 
 describe('renderSetup', () => {
   it('Windows 路径转成正斜杠，Claude Code 与 Codex 各给一条命令', () => {
     const out = renderSetup(win);
-    expect(out).toContain('claude mcp add -s user -e QQDL_TOKEN=abc quanqiudaili -- node C:/tools/quanqiudaili-mcp/dist/src/index.js');
-    expect(out).toContain('codex mcp add quanqiudaili --env QQDL_TOKEN=abc -- node C:/tools/quanqiudaili-mcp/dist/src/index.js');
+    expect(out).toContain('claude mcp add -s user -e QQDL_TOKEN=abc quanqiudaili -- node C:/tools/quanqiudaili-agent-tools/dist/src/index.js');
+    expect(out).toContain('codex mcp add quanqiudaili --env QQDL_TOKEN=abc -- node C:/tools/quanqiudaili-agent-tools/dist/src/index.js');
     expect(out).not.toContain('--readonly');
   });
 
@@ -19,22 +19,22 @@ describe('renderSetup', () => {
     expect(out).toContain(JSON.stringify({ servers: { quanqiudaili: { type: 'stdio', command: 'node', args, env } } }, null, 2));
     expect(out).toContain(JSON.stringify({ context_servers: { quanqiudaili: { command: 'node', args, env } } }, null, 2));
     expect(out).toContain(
-      '[mcp_servers.quanqiudaili]\ncommand = "node"\nargs = ["C:/tools/quanqiudaili-mcp/dist/src/index.js"]\n\n[mcp_servers.quanqiudaili.env]\nQQDL_TOKEN = "abc"',
+      '[mcp_servers.quanqiudaili]\ncommand = "node"\nargs = ["C:/tools/quanqiudaili-agent-tools/dist/src/index.js"]\n\n[mcp_servers.quanqiudaili.env]\nQQDL_TOKEN = "abc"',
     );
   });
 
   it('--readonly 进入每种客户端的参数列表', () => {
     const out = renderSetup({ ...win, readonly: true });
-    expect(out).toContain('-- node C:/tools/quanqiudaili-mcp/dist/src/index.js --readonly');
+    expect(out).toContain('-- node C:/tools/quanqiudaili-agent-tools/dist/src/index.js --readonly');
     expect(out).toContain('"--readonly"');
-    expect(out).toContain('args = ["C:/tools/quanqiudaili-mcp/dist/src/index.js", "--readonly"]');
+    expect(out).toContain('args = ["C:/tools/quanqiudaili-agent-tools/dist/src/index.js", "--readonly"]');
   });
 
   it('--npx 时命令是 npx -y github:仓库，不含本机路径，--readonly 跟在后面', () => {
     const out = renderSetup({ ...win, npx: true, readonly: true });
-    expect(out).toContain('claude mcp add -s user -e QQDL_TOKEN=abc quanqiudaili -- npx -y github:empty-byte/quanqiudaili-mcp --readonly');
-    expect(out).toContain(JSON.stringify({ mcpServers: { quanqiudaili: { command: 'npx', args: ['-y', 'github:empty-byte/quanqiudaili-mcp', '--readonly'], env } } }, null, 2));
-    expect(out).toContain('[mcp_servers.quanqiudaili]\ncommand = "npx"\nargs = ["-y", "github:empty-byte/quanqiudaili-mcp", "--readonly"]');
+    expect(out).toContain('claude mcp add -s user -e QQDL_TOKEN=abc quanqiudaili -- npx -y github:empty-byte/quanqiudaili-agent-tools --readonly');
+    expect(out).toContain(JSON.stringify({ mcpServers: { quanqiudaili: { command: 'npx', args: ['-y', 'github:empty-byte/quanqiudaili-agent-tools', '--readonly'], env } } }, null, 2));
+    expect(out).toContain('[mcp_servers.quanqiudaili]\ncommand = "npx"\nargs = ["-y", "github:empty-byte/quanqiudaili-agent-tools", "--readonly"]');
     expect(out).not.toContain('C:/tools');
   });
 
@@ -48,9 +48,9 @@ describe('renderSetup', () => {
     const w = renderSetup(win);
     expect(w).toContain('%APPDATA%\\Claude\\claude_desktop_config.json');
     expect(w).toContain('%APPDATA%\\devin\\mcp_config.json');
-    const mac = renderSetup({ ...win, indexPath: '/opt/quanqiudaili-mcp/dist/src/index.js', platform: 'darwin' });
+    const mac = renderSetup({ ...win, indexPath: '/opt/quanqiudaili-agent-tools/dist/src/index.js', platform: 'darwin' });
     expect(mac).toContain('~/Library/Application Support/Claude/claude_desktop_config.json');
     expect(mac).toContain('~/.config/devin/mcp_config.json');
-    expect(mac).toContain('-- node /opt/quanqiudaili-mcp/dist/src/index.js');
+    expect(mac).toContain('-- node /opt/quanqiudaili-agent-tools/dist/src/index.js');
   });
 });

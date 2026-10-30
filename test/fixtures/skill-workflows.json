@@ -1,0 +1,622 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "bandwidth_detail",
+      "workflow": "renewal",
+      "tool": "bandwidth_detail",
+      "arguments": {
+        "product_type_id": 3,
+        "subAccount": "71001"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "bandwidth_monitoring_list",
+      "workflow": "renewal",
+      "tool": "bandwidth_monitoring_list",
+      "arguments": {
+        "product_type_id": 3,
+        "subAccounts": [
+          "71001",
+          "71002"
+        ]
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "bandwidth_package_list",
+      "workflow": "renewal",
+      "tool": "bandwidth_package_list",
+      "arguments": {
+        "product_type_id": 3,
+        "country": "US"
+      },
+      "backendData": [
+        {
+          "num": 5,
+          "price": "0.00",
+          "month_price": "0.00"
+        },
+        {
+          "num": 10,
+          "price": "0.10",
+          "month_price": "3.00"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "bandwidth_trend",
+      "workflow": "renewal",
+      "tool": "bandwidth_trend",
+      "arguments": {
+        "product_type_id": 3,
+        "subAccount": "71001",
+        "trend_type": 1
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "bandwidth_upgrade_price",
+      "workflow": "renewal",
+      "tool": "bandwidth_upgrade_price",
+      "arguments": {
+        "product_type_id": 3,
+        "sub_accounts": [
+          "71001"
+        ],
+        "bandwidth_num": 10
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "dynamic_city_list",
+      "workflow": "connection",
+      "tool": "dynamic_city_list",
+      "arguments": {
+        "product_type_id": 1,
+        "country_code": "US"
+      },
+      "backendData": [
+        {
+          "code": "New York",
+          "name": "New York"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "dynamic_country_list",
+      "workflow": "connection",
+      "tool": "dynamic_country_list",
+      "arguments": {
+        "product_type_id": 1
+      },
+      "backendData": [
+        {
+          "id": 501,
+          "code": "US",
+          "name": "美国"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "dynamic_state_list",
+      "workflow": "connection",
+      "tool": "dynamic_state_list",
+      "arguments": {
+        "product_type_id": 1,
+        "country_code": "US"
+      },
+      "backendData": [
+        {
+          "code": "New York",
+          "name": "New York"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "order_bandwidth_upgrade",
+      "workflow": "renewal",
+      "tool": "order_bandwidth_upgrade",
+      "arguments": {
+        "product_type_id": 3,
+        "subAccountIds": [
+          "71001"
+        ],
+        "bandwidth_num": 10
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_buy_dynamic",
+      "workflow": "purchase",
+      "tool": "order_buy_dynamic",
+      "arguments": {
+        "product_type_id": 6,
+        "num": 500,
+        "bill_timelen": 1
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_buy_dynamic_bandwidth",
+      "workflow": "purchase",
+      "tool": "order_buy_dynamic_bandwidth",
+      "arguments": {
+        "product_type_id": 11,
+        "country": "DE",
+        "bill_timelen": 1,
+        "bandwidth_num": 20,
+        "remark": "离线模拟"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_buy_test_ip",
+      "workflow": "purchase",
+      "tool": "order_buy_test_ip",
+      "arguments": {
+        "product_type_id": 3,
+        "num": 1,
+        "timelen": 12,
+        "country": "US",
+        "bandwidth_num": 5
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_buy_time_ip",
+      "workflow": "purchase",
+      "tool": "order_buy_time_ip",
+      "arguments": {
+        "product_type_id": 3,
+        "num": 2,
+        "timelen": 1,
+        "country": "US",
+        "city": "New York",
+        "appoint_ip": [
+          {
+            "ip_str": "192.0",
+            "count": 2
+          }
+        ]
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_refund_apply",
+      "workflow": "removal",
+      "tool": "order_refund_apply",
+      "arguments": {
+        "order_product_buy_id": 92001,
+        "ids": [
+          "71001"
+        ],
+        "remark": "离线模拟退单"
+      },
+      "backendData": {
+        "status": "pending"
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_refund_dynamic_bandwidth",
+      "workflow": "removal",
+      "tool": "order_refund_dynamic_bandwidth",
+      "arguments": {
+        "order_product_buy_id": 92011,
+        "remark": "离线模拟退单"
+      },
+      "backendData": {
+        "status": "pending"
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_renew",
+      "workflow": "renewal",
+      "tool": "order_renew",
+      "arguments": {
+        "product_type_id": 3,
+        "timelen": 1,
+        "sub_account_ids": "71001,71002"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_renew_dynamic_bandwidth",
+      "workflow": "renewal",
+      "tool": "order_renew_dynamic_bandwidth",
+      "arguments": {
+        "sub_account_id": "81011",
+        "bill_timelen": 2
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "order_upgrade_dynamic_bandwidth",
+      "workflow": "renewal",
+      "tool": "order_upgrade_dynamic_bandwidth",
+      "arguments": {
+        "sub_account_id": "81011",
+        "bandwidth_num": 30
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "product_list",
+      "workflow": "purchase",
+      "tool": "product_list",
+      "arguments": {},
+      "backendData": [
+        {
+          "id": 1,
+          "name": "动态住宅流量"
+        },
+        {
+          "id": 3,
+          "name": "静态住宅原生"
+        },
+        {
+          "id": 11,
+          "name": "动态住宅不限流量"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "product_unit_price",
+      "workflow": "purchase",
+      "tool": "product_unit_price",
+      "arguments": {
+        "product_type_id": 11,
+        "country": "DE",
+        "bandwidth_num": 20,
+        "bill_timelen": 1
+      },
+      "backendData": {
+        "product_type_id": 11,
+        "currency": "CNY",
+        "realPrice": "120.00"
+      },
+      "checks": {}
+    },
+    {
+      "id": "static_city_list",
+      "workflow": "purchase",
+      "tool": "static_city_list",
+      "arguments": {
+        "product_type_id": 3,
+        "country_code": "US"
+      },
+      "backendData": [
+        {
+          "id": 602,
+          "code": "New York",
+          "name": "New York"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "static_country_list",
+      "workflow": "purchase",
+      "tool": "static_country_list",
+      "arguments": {
+        "product_type_id": 3
+      },
+      "backendData": [
+        {
+          "id": 601,
+          "code": "US",
+          "name": "美国"
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "static_ip_range_list",
+      "workflow": "purchase",
+      "tool": "static_ip_range_list",
+      "arguments": {
+        "product_type_id": 3,
+        "country_code": "US",
+        "page": 1,
+        "pagesize": 20
+      },
+      "backendData": {
+        "total": 1,
+        "rows": [
+          {
+            "ipStr": "192.0",
+            "num": 2
+          }
+        ]
+      },
+      "checks": {}
+    },
+    {
+      "id": "static_region_stock",
+      "workflow": "purchase",
+      "tool": "static_region_stock",
+      "arguments": {
+        "product_type_id": 3,
+        "country_code": "US"
+      },
+      "backendData": [
+        {
+          "country_code": "US",
+          "city_name": "New York",
+          "remark": "充足",
+          "sku_status": 0
+        }
+      ],
+      "checks": {}
+    },
+    {
+      "id": "stock_check",
+      "workflow": "purchase",
+      "tool": "stock_check",
+      "arguments": {
+        "product_type_id": 3,
+        "num": 2,
+        "country": "US",
+        "city": "New York"
+      },
+      "backendData": {
+        "stock": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_add",
+      "workflow": "accounts",
+      "tool": "sub_account_add",
+      "arguments": {
+        "product_type_id": 1,
+        "num": 1,
+        "changeInterval": 10,
+        "country": "US"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_delete",
+      "workflow": "removal",
+      "tool": "sub_account_delete",
+      "arguments": {
+        "product_type_id": 1,
+        "id": "61001"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_delete_batch",
+      "workflow": "removal",
+      "tool": "sub_account_delete_batch",
+      "arguments": {
+        "product_type_id": 1,
+        "ids": "61001,61002"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_flow_query",
+      "workflow": "accounts",
+      "tool": "sub_account_flow_query",
+      "arguments": {
+        "product_type_id": 1,
+        "subAccount": "61001",
+        "month": "2026-10"
+      },
+      "backendData": {
+        "total": 2,
+        "rows": [
+          {
+            "date": "2026-10-01",
+            "flow": 1024
+          },
+          {
+            "date": "2026-10-02",
+            "flow": 512
+          }
+        ]
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_limit_flow",
+      "workflow": "accounts",
+      "tool": "sub_account_limit_flow",
+      "arguments": {
+        "product_type_id": 1,
+        "id": "61001"
+      },
+      "backendData": {
+        "limit_flow": 20,
+        "type": 1,
+        "timelen": 3,
+        "use_flow": 1073741824,
+        "disabled": 0
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_list",
+      "workflow": "accounts",
+      "tool": "sub_account_list",
+      "arguments": {
+        "product_type_id": 11,
+        "page": 1,
+        "pagesize": 20,
+        "ids": "91011"
+      },
+      "backendData": {
+        "total": 1,
+        "rows": [
+          {
+            "id": "91011",
+            "sub_account_id": "81011",
+            "order_product_buy_id": 92011,
+            "username": "fixture11",
+            "target": "fixture.invalid",
+            "port": 5001,
+            "bandwidth_num": 20,
+            "can_renew": 1,
+            "can_apply_back": 1
+          }
+        ]
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_set_credentials",
+      "workflow": "accounts",
+      "tool": "sub_account_set_credentials",
+      "arguments": {
+        "product_type_id": 1,
+        "content": [
+          {
+            "id": "61001",
+            "customUsername": "fixtureUser01",
+            "customPassword": "fixturePass01"
+          }
+        ]
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_set_limit_flow",
+      "workflow": "accounts",
+      "tool": "sub_account_set_limit_flow",
+      "arguments": {
+        "product_type_id": 1,
+        "id": "61001",
+        "limit_flow": 20,
+        "type": 1,
+        "timelen": 3
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_toggle_direct",
+      "workflow": "accounts",
+      "tool": "sub_account_toggle_direct",
+      "arguments": {
+        "product_type_id": 3,
+        "ids": "71001,71002",
+        "use_ip_port": 1
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_update",
+      "workflow": "accounts",
+      "tool": "sub_account_update",
+      "arguments": {
+        "product_type_id": 1,
+        "id": "61001",
+        "remark": "离线模拟备注"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "sub_account_update_batch",
+      "workflow": "accounts",
+      "tool": "sub_account_update_batch",
+      "arguments": {
+        "product_type_id": 1,
+        "ids": "61001,61002",
+        "remark": "离线模拟批量备注"
+      },
+      "backendData": {
+        "accepted": true
+      },
+      "checks": {}
+    },
+    {
+      "id": "user_balance",
+      "workflow": "purchase",
+      "tool": "user_balance",
+      "arguments": {},
+      "backendData": {
+        "money": "1000.00",
+        "give_money": "0.00"
+      },
+      "checks": {}
+    },
+    {
+      "id": "user_info",
+      "workflow": "purchase",
+      "tool": "user_info",
+      "arguments": {},
+      "backendData": {
+        "id": 99901,
+        "money": "1000.00",
+        "user_group": 2
+      },
+      "checks": {}
+    }
+  ]
+}

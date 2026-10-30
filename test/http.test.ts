@@ -28,7 +28,7 @@ describe('cfgFromEnv', () => {
   });
   it('缺 token 抛出带提示的错误，并说明要写在客户端配置里', () => {
     expect(() => cfgFromEnv({})).toThrow(/QQDL_TOKEN/);
-    expect(() => cfgFromEnv({})).toThrow(/不继承终端/);
+    expect(() => cfgFromEnv({})).toThrow(/可能无法继承另一个终端/);
     expect(() => cfgFromEnv({})).toThrow(/-e QQDL_TOKEN/);
   });
   it.each(['\n', '\r', '\t', '\0', '\x1f', '\x7f'])('拒绝 token 内部控制字符 %j，错误不回显 Key', control => {

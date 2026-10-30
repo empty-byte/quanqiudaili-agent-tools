@@ -3,4 +3,8 @@ dist/
 .vitest/
 .mcp.json
 docs/*
+!docs/README.md
+!docs/2026-10-30-*.md
 .codex/config.toml
+.quanqiudaili-agent-tools/
+*.qqdl-backup-*

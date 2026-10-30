@@ -59,6 +59,7 @@ const textOf = (r: { content?: unknown }) => ((r.content as { text: string }[])[
 describe('stdio server', () => {
   it('不带参数暴露全部 38 个工具，扣费与删除工具带 destructiveHint', async () => {
     const c = await connect([]);
+    expect(c.getServerVersion()?.name).toBe('quanqiudaili-agent-tools');
     const { tools } = await c.listTools();
     expect(tools).toHaveLength(38);
     const buy = tools.find(t => t.name === 'order_buy_time_ip');

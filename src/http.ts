@@ -13,7 +13,7 @@ export function cfgFromEnv(env: NodeJS.ProcessEnv = process.env): Cfg {
   if (!token) {
     throw new Error(
       '缺少环境变量 QQDL_TOKEN。请到全球代理网站的 API Keys 页面生成一个 API Key 填进来，做法见 README。' +
-        '客户端拉起本服务时不继承终端里的环境变量，token 要写在客户端配置里（如 claude mcp add -e QQDL_TOKEN=…），用 Inspector 调试时通过 -e 传入。',
+        '客户端可能无法继承另一个终端里的环境变量，请在客户端配置中提供 QQDL_TOKEN（如 claude mcp add -e QQDL_TOKEN=…），用 Inspector 调试时通过 -e 传入。',
     );
   }
   if (/[\x00-\x1f\x7f]/.test(token)) {
