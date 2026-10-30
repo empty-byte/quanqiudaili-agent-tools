@@ -11,6 +11,10 @@
 
 ### 2. 运行安装命令
 
+以下两种方式任选一种。
+
+#### 方式 1：一键安装
+
 在电脑终端中执行（Windows PowerShell、macOS/Linux 终端均可）：
 
 ```bash
@@ -19,7 +23,22 @@ npx -y github:empty-byte/quanqiudaili-agent-tools install
 
 命令会自动从 GitHub 下载项目、安装依赖并构建，无需提前下载源码或运行 `npm ci`。首次执行需要等待下载完成。
 
-按提示完成三项选择：
+#### 方式 2：Git 下载到本地安装
+
+在终端进入准备存放项目的目录，依次执行：
+
+```bash
+git clone https://github.com/empty-byte/quanqiudaili-agent-tools.git
+cd quanqiudaili-agent-tools
+npm ci
+node dist/src/index.js install
+```
+
+`git clone` 下载项目，`cd` 进入项目根目录；`npm ci` 安装依赖并自动构建。已有源码时，进入项目根目录后从 `npm ci` 开始执行。
+
+#### 完成安装
+
+两种方式都会进入同一个安装流程，按提示完成三项选择：
 
 1. 选择你使用的客户端：空格勾选，可多选，回车继续。
 2. 安装范围选择“当前用户的所有项目”，后续项目也能使用。
@@ -59,7 +78,7 @@ npx -y github:empty-byte/quanqiudaili-agent-tools install --agents claude-code,c
 
 ## 常用选项
 
-以下选项追加在安装命令末尾，例如 `install --agents codex --readonly`。
+两种安装方式都将以下选项追加在 `install` 后，例如 `install --agents codex --readonly`。
 
 | 选项 | 用途 |
 | --- | --- |
@@ -84,22 +103,6 @@ Windsurf 和 Cline 仅支持用户级安装。Claude Code 与 GitHub Copilot CLI
 - [Skill 操作说明](https://github.com/empty-byte/quanqiudaili-agent-tools/blob/main/skills/quanqiudaili/SKILL.md)：产品选择与各类操作流程。
 - [API 文档](https://develop.quanqiudaili.com/)：接口与产品规则。
 - [开发与维护](https://github.com/empty-byte/quanqiudaili-agent-tools/blob/main/AGENTS.md)：项目结构、构建、测试与工具定义维护。
-
-<details>
-<summary>从源码安装或参与开发</summary>
-
-需要自行管理源码时，在终端依次执行：
-
-```bash
-git clone https://github.com/empty-byte/quanqiudaili-agent-tools.git
-cd quanqiudaili-agent-tools
-npm ci
-node dist/src/index.js install
-```
-
-`npm ci` 会安装依赖并自动构建。已有源码时，进入项目根目录后执行后两条命令即可；运行 `npm test` 可执行本地测试。
-
-</details>
 
 ## 许可
 
