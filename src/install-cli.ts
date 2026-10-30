@@ -110,7 +110,8 @@ export async function runInstall(argv: string[]): Promise<number> {
           break;
         }
         const reason = response.isError ? message.replace(/[\x00-\x1f\x7f]/g, ' ') : '用户信息响应不完整，无法确认 Key 是否有效。';
-        console.error(`API Key 验证失败，尚未安装：${reason}`);
+        const failure = `API Key 验证失败，尚未安装：${reason}`;
+        console.error(process.stderr.isTTY && process.stderr.hasColors?.() ? `\x1b[1;31m${failure}\x1b[0m` : failure);
         if (!interactiveToken) return 1;
         console.log('请核对 Key 或网络后重新输入；Ctrl+C 取消。');
       }
