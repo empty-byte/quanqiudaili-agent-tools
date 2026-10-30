@@ -43,6 +43,7 @@ function maskToken(token: string): string {
  */
 export async function runInstall(argv: string[]): Promise<number> {
   try {
+    const color = process.stdout.isTTY && process.stdout.hasColors?.();
     const { values } = parseArgs({ args: argv, strict: true, options: {
       agents: { type: 'string', multiple: true },
       scope: { type: 'string' },
@@ -106,7 +107,8 @@ export async function runInstall(argv: string[]): Promise<number> {
         const id: unknown = response.isError ? undefined : JSON.parse(message).data;
         if (!response.isError && (typeof id === 'number' && Number.isInteger(id) && id > 0 || typeof id === 'string' && /^[1-9]\d*$/.test(id))) {
           apiConfig = { baseUrl: cfg.baseUrl, timeoutMs: cfg.timeoutMs };
-          console.log(`API Key 验证通过（${maskToken(cfg.token)}）。`);
+          const success = 'API Key 验证通过，开始安装。';
+          console.log(color ? `\x1b[1;32m${success}\x1b[0m` : success);
           break;
         }
         const reason = response.isError ? message.replace(/[\x00-\x1f\x7f]/g, ' ') : '用户信息响应不完整，无法确认 Key 是否有效。';
@@ -121,10 +123,16 @@ export async function runInstall(argv: string[]): Promise<number> {
       cwd: process.cwd(), sourceRoot: fileURLToPath(new URL('../../', import.meta.url)),
       token, ...apiConfig, readonly: values.readonly, dryRun: values['dry-run'], replace: values.replace,
     });
-    console.log(values['dry-run'] ? '安装预览（未写入）：' : result.changedFiles.length ? 'Skills 与 MCP 配置已安装：' : '安装内容已是当前版本：');
-    for (const target of result.targets) console.log(`${target.agent}\n  Skill: ${target.skillPath}\n  MCP: ${target.configPath}`);
-    console.log(`运行入口: ${result.runtimePath}`);
-    if (!values['dry-run']) console.log('API Key 已通过用户信息接口验证。请重新加载所选客户端并启用 quanqiudaili，确认 MCP 连接正常；写操作仍需确认。');
+    if (values['dry-run']) {
+      console.log('安装预览（未写入）：');
+      for (const target of result.targets) console.log(`${target.agent}\n  Skill: ${target.skillPath}\n  MCP: ${target.configPath}`);
+      console.log(`运行入口: ${result.runtimePath}`);
+    } else {
+      for (const message of [
+        ...result.targets.map(target => `${target.agent}：Skill 和 MCP 配置已安装`),
+        '请重启对应客户端，即可使用全球代理。',
+      ]) console.log(color ? `\x1b[1;32m${message}\x1b[0m` : message);
+    }
     return 0;
   } catch (error) {
     // 不输出第三方异常上下文，避免解析错误或命令参数带出密钥。
