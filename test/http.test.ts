@@ -45,6 +45,7 @@ describe('callApi', () => {
     expect(seen.url).toBe('https://example.test/externalapi/user/getUserInfo?page=1&is_mcp_send=1');
     expect((seen.init?.headers as Record<string, string>).token).toBe('tk');
     expect((seen.init?.headers as Record<string, string>)['user-agent']).toBe('quanqiudaili mcp');
+    expect(seen.init?.redirect).toBe('error');
     expect(r.isError).toBeUndefined();
     expect(JSON.parse(textOf(r))).toEqual({ code: 1, msg: 'ok', data: { balance: 9 } });
   });
@@ -77,6 +78,17 @@ describe('callApi', () => {
     const r = await callApi(tool(), {}, cfg, stub(200, '{"code":"1","msg":"ok","data":[]}'));
     expect(r.isError).toBeUndefined();
     expect(JSON.parse(textOf(r))).toEqual({ code: 1, msg: 'ok', data: [] });
+  });
+
+  it.each([401, 403, 500])('HTTP %i 即使业务 code 为 1 也不能视为成功', async status => {
+    const response = await callApi(tool(), {}, cfg, stub(status, '{"code":1,"msg":"错误响应","data":{"id":1}}'));
+    expect(response.isError).toBe(true);
+  });
+
+  it.each([true, null, '', [], [1]])('拒绝非数值业务状态 %j', async code => {
+    const response = await callApi(tool(), {}, cfg, stub(200, JSON.stringify({ code, data: { id: 1 } })));
+    expect(response.isError).toBe(true);
+    expect(textOf(response)).toContain('响应格式异常');
   });
 
   it('HTTP 401 或 code 401 提示 token 失效，且不回显 token', async () => {

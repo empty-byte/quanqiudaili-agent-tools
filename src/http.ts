@@ -46,7 +46,7 @@ const pickField = (data: unknown, key: string): unknown =>
   (data && typeof data === 'object' ? (data as Record<string, unknown>)[key] : undefined) ?? null;
 
 export async function callApi(
-  tool: ToolDef,
+  tool: Pick<ToolDef, 'method' | 'path' | 'fixed' | 'pick'>,
   args: Record<string, unknown>,
   cfg: Cfg,
   fetchImpl: typeof fetch = fetch,
@@ -60,7 +60,8 @@ export async function callApi(
   const form = toForm({ ...args, ...tool.fixed, is_mcp_send: 1 }).toString();
   const url = new URL(cfg.baseUrl + tool.path);
   const headers: Record<string, string> = { token: cfg.token, accept: 'application/json', 'user-agent': 'quanqiudaili mcp' };
-  const init: RequestInit = { method: tool.method, headers, signal: AbortSignal.timeout(cfg.timeoutMs) };
+  // 鉴权请求不跟随重定向，避免把 token 转发到其他地址。
+  const init: RequestInit = { method: tool.method, headers, redirect: 'error', signal: AbortSignal.timeout(cfg.timeoutMs) };
   if (tool.method === 'GET') {
     url.search = form;
   } else {
@@ -82,14 +83,15 @@ export async function callApi(
   }
 
   const body = parseBody(raw);
-  const code = body ? Number(body.code) : NaN;
+  const code = body && (typeof body.code === 'number' || typeof body.code === 'string' && body.code.trim()) ? Number(body.code) : NaN;
   if (!body || !Number.isFinite(code)) return fail(`HTTP ${status}，响应格式异常：${redact(raw).slice(0, 200)}`);
 
   const msg = String(body.msg ?? '');
-  if (code === 1) return text(JSON.stringify({ code, msg, data: tool.pick ? pickField(body.data, tool.pick) : body.data ?? null }));
   if (code === 401 || code === 403 || status === 401) {
     return fail(`token 无效（${msg}）。API Key 永久有效，但可能被删除或复制不完整：到网站 API Keys 页面核对或重新生成，更新 QQDL_TOKEN 后重启本 MCP。`);
   }
+  if (status < 200 || status >= 300) return fail(`HTTP ${status}，请求失败${msg ? `：${msg}` : ''}`);
+  if (code === 1) return text(JSON.stringify({ code, msg, data: tool.pick ? pickField(body.data, tool.pick) : body.data ?? null }));
   if (msg.includes('访问频繁')) return fail(`${msg} 后端限流为每个接口每 IP 每分钟 180 次，请稍后重试。`);
   return fail(body.data == null ? msg : `${msg}\n${JSON.stringify(body.data)}`);
 }

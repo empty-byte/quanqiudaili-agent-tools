@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
+import { execFile } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { promisify } from 'node:util';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import TOML from '@iarna/toml';
@@ -317,6 +319,43 @@ describe('Skills 与 MCP 一体安装', () => {
       await client.close();
       backend.closeAllConnections();
       await new Promise<void>((resolveClose, reject) => backend.close(error => error ? reject(error) : resolveClose()));
+    }
+  }, 20_000);
+
+  it('真实安装命令先鉴权，错误零写入，通过后保存同一 Key 和后端配置', async () => {
+    const env = sandbox();
+    const seen: string[] = [];
+    const backend = createServer((req, res) => {
+      seen.push(`${req.method} ${req.url}`);
+      const authorized = req.headers.token === fakeToken;
+      res.writeHead(authorized ? 200 : 401, { 'content-type': 'application/json' });
+      res.end(JSON.stringify(authorized
+        ? { code: 1, msg: 'ok', data: { id: 123, email: 'private@example.test' } }
+        : { code: 401, msg: 'API Key 无效或已删除' }));
+    });
+    await new Promise<void>(done => backend.listen(0, '127.0.0.1', done));
+    const baseUrl = `http://127.0.0.1:${(backend.address() as { port: number }).port}`;
+    const childEnv = { ...process.env, HOME: env.home, USERPROFILE: env.home, QQDL_BASE_URL: baseUrl, QQDL_TIMEOUT_MS: '2000', QQDL_TOKEN: 'sk-wrong-fixture' };
+    const run = promisify(execFile);
+    const args = [join(projectRoot, 'dist/src/index.js'), 'install', '--agents', 'cursor', '--scope', 'project'];
+    try {
+      // 先确认子进程用户目录已隔离，避免测试碰到开发者的真实运行包。
+      const homeCheck = await run(process.execPath, ['-p', 'require("node:os").homedir()'], { cwd: env.cwd, env: childEnv });
+      expect(resolve(homeCheck.stdout.trim())).toBe(resolve(env.home));
+      const before = snapshot(env.root);
+      await expect(run(process.execPath, args, { cwd: env.cwd, env: childEnv })).rejects.toMatchObject({ code: 1, stderr: expect.stringContaining('验证失败') });
+      expect(snapshot(env.root)).toEqual(before);
+      const { stdout, stderr } = await run(process.execPath, args, { cwd: env.cwd, env: { ...childEnv, QQDL_TOKEN: fakeToken } });
+      expect(stdout).toContain('验证通过');
+      expect(stdout + stderr).not.toContain(fakeToken);
+      expect(stdout + stderr).not.toContain('private@example.test');
+      const target = resolveTarget('cursor', 'project', env.cwd, env.home);
+      expect(readEntry(target).env).toEqual({ QQDL_TOKEN: fakeToken, QQDL_BASE_URL: baseUrl, QQDL_TIMEOUT_MS: '2000' });
+      expect(existsSync(join(target.skillPath, 'SKILL.md'))).toBe(true);
+      expect(seen).toEqual(Array(2).fill('GET /externalapi/user/getUserInfo?is_mcp_send=1'));
+    } finally {
+      backend.closeAllConnections();
+      await new Promise<void>((done, reject) => backend.close(error => error ? reject(error) : done()));
     }
   }, 20_000);
 });

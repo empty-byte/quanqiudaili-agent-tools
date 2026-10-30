@@ -4,7 +4,9 @@ dist/
 .mcp.json
 docs/*
 !docs/README.md
-!docs/2026-10-30-*.md
+!docs/DEVELOPMENT.md
+docs/private/
+.superpowers/
 .codex/config.toml
 .quanqiudaili-agent-tools/
 *.qqdl-backup-*

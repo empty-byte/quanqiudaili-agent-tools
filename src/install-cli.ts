@@ -1,14 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { isCancel, multiselect, password, select } from '@clack/prompts';
+import { isCancel, multiselect, text, select } from '@clack/prompts';
 import { agents, detectGlobalAgents } from 'add-mcp';
 import { INSTALL_AGENTS, type InstallAgent, type InstallScope } from './install-config.js';
 import { installBundle } from './install.js';
+import { callApi, cfgFromEnv, type Cfg } from './http.js';
 
 const HELP = `用法：quanqiudaili-agent-tools install [选项]
 一次安装业务 Skill 和本地 MCP，保留写操作确认。
-QQDL_TOKEN（网站 API Key）为必填凭据；未预先提供时会提示隐藏输入，留空不能安装。
+QQDL_TOKEN（网站 API Key）为必填凭据；交互输入时直接显示，验证提示只显示首尾。
+安装前查询用户信息验证 Key，失败不写入；交互输入错误可重输，Ctrl+C 取消。
 
   --agents 名称列表   逗号分隔，可多次指定；不传时交互选择
   --scope user       用户级（默认）或 project 项目级
@@ -21,7 +23,17 @@ QQDL_TOKEN（网站 API Key）为必填凭据；未预先提供时会提示隐�
 
 重复执行 install 可更新本安装器管理的配置与技能。
 真实 API Key 只写入所选客户端本地配置，不写入 Skill；项目级配置请勿提交。
-安装期间不会执行购买、续费、删除或其他后端请求。`;
+安装期间仅请求只读用户信息接口验证 Key，不执行购买、续费或删除。`;
+
+/**
+ * 在验证提示中只保留 Key 首尾各四位，短 Key 全部遮罩。
+ *
+ * @param token 已去除首尾空白的凭据。
+ * @return string，可用于安装提示的脱敏文本。
+ */
+function maskToken(token: string): string {
+  return token.length > 8 ? `${token.slice(0, 4)}****${token.slice(-4)}` : '****';
+}
 
 /**
  * 执行独立安装入口，不改变 setup 仅输出配置的行为。
@@ -71,27 +83,52 @@ export async function runInstall(argv: string[]): Promise<number> {
       scope = answer;
     }
     if (scope !== 'user' && scope !== 'project') throw new Error('--scope 只能是 user 或 project。');
-    let token = values['token-stdin'] ? readFileSync(0, 'utf8').trim() : process.env.QQDL_TOKEN;
-    if (!token && !values['dry-run']) {
-      if (!process.stdin.isTTY) throw new Error('请通过 QQDL_TOKEN 或 --token-stdin 提供 API Key。');
-      const answer = await password({ message: '输入 QQDL_TOKEN（网站 API Key，必填，只保存到所选客户端配置）：', validate: value => !value.trim() ? 'QQDL_TOKEN（API Key）为必填项，不能为空。' : undefined });
-      if (isCancel(answer)) return 1;
-      token = answer;
+    let token = (values['token-stdin'] ? readFileSync(0, 'utf8') : process.env.QQDL_TOKEN)?.trim();
+    let apiConfig: Pick<Cfg, 'baseUrl' | 'timeoutMs'> | undefined;
+    if (!values['dry-run']) {
+      const interactiveToken = !token && !values['token-stdin'] && process.stdin.isTTY;
+      if (!token && !interactiveToken) throw new Error('请通过 QQDL_TOKEN 或 --token-stdin 提供 API Key。');
+      while (true) {
+        if (interactiveToken) {
+          const answer = await text({
+            message: '输入 QQDL_TOKEN（网站 API Key，必填，输入时可见；Ctrl+C 取消）：',
+            validate: value => !value.trim() ? 'QQDL_TOKEN（API Key）为必填项，不能为空。'
+              : /[\x00-\x1f\x7f]/.test(value.trim()) ? 'API Key 不能包含控制字符，请重新复制。' : undefined,
+          });
+          if (isCancel(answer)) return 1;
+          token = answer.trim();
+        }
+        const cfg = cfgFromEnv({ ...process.env, QQDL_TOKEN: token });
+        console.log(`正在验证 API Key（${maskToken(cfg.token)}）…`);
+        const response = await callApi({ method: 'GET', path: '/externalapi/user/getUserInfo', pick: 'id' }, {}, cfg);
+        const message = response.content.find(item => item.type === 'text')?.text ?? '';
+        // 只检查用户标识，不把完整账号资料输出到终端。
+        const id: unknown = response.isError ? undefined : JSON.parse(message).data;
+        if (!response.isError && (typeof id === 'number' && Number.isInteger(id) && id > 0 || typeof id === 'string' && /^[1-9]\d*$/.test(id))) {
+          apiConfig = { baseUrl: cfg.baseUrl, timeoutMs: cfg.timeoutMs };
+          console.log(`API Key 验证通过（${maskToken(cfg.token)}）。`);
+          break;
+        }
+        const reason = response.isError ? message.replace(/[\x00-\x1f\x7f]/g, ' ') : '用户信息响应不完整，无法确认 Key 是否有效。';
+        console.error(`API Key 验证失败，尚未安装：${reason}`);
+        if (!interactiveToken) return 1;
+        console.log('请核对 Key 或网络后重新输入；Ctrl+C 取消。');
+      }
     }
     const result = installBundle({
       agents: selected as InstallAgent[], scope: scope as InstallScope,
       cwd: process.cwd(), sourceRoot: fileURLToPath(new URL('../../', import.meta.url)),
-      token, readonly: values.readonly, dryRun: values['dry-run'], replace: values.replace,
+      token, ...apiConfig, readonly: values.readonly, dryRun: values['dry-run'], replace: values.replace,
     });
     console.log(values['dry-run'] ? '安装预览（未写入）：' : result.changedFiles.length ? 'Skills 与 MCP 配置已安装：' : '安装内容已是当前版本：');
     for (const target of result.targets) console.log(`${target.agent}\n  Skill: ${target.skillPath}\n  MCP: ${target.configPath}`);
     console.log(`运行入口: ${result.runtimePath}`);
-    if (!values['dry-run']) console.log('请重新加载所选客户端并启用 quanqiudaili。已写入配置，尚未验证客户端连接或线上鉴权；写操作仍需确认。');
+    if (!values['dry-run']) console.log('API Key 已通过用户信息接口验证。请重新加载所选客户端并启用 quanqiudaili，确认 MCP 连接正常；写操作仍需确认。');
     return 0;
   } catch (error) {
     // 不输出第三方异常上下文，避免解析错误或命令参数带出密钥。
     const message = error instanceof Error ? error.message : '安装失败。';
-    const known = /^(请选择|需要有效|安装|客户端|MCP 配置|技能|运行包|已安装|多个 Agent|Agent 名称|非交互|请通过|--scope|测试目录|[\w-]+ (?:不支持项目级|暂不支持|已有不同|与其他 Agent))/;
+    const known = /^(请选择|需要有效|QQDL_TOKEN 格式|QQDL_TIMEOUT_MS|安装|客户端|MCP 配置|技能|运行包|已安装|多个 Agent|Agent 名称|非交互|请通过|--scope|测试目录|[\w-]+ (?:不支持项目级|暂不支持|已有不同|与其他 Agent))/;
     console.error(known.test(message) ? message : '安装失败，请检查参数、安装包和目标目录权限；可用 install --help 查看用法。');
     return 1;
   }

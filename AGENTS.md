@@ -4,9 +4,9 @@
 
 ## 项目是什么
 
-全球代理（quanqiudaili.com）的 Agent 工具项目，包含对外 HTTP 接口 `externalapi` 的 MCP 服务器和依赖它的业务 Skills。MCP 使用 TypeScript、官方 MCP SDK v2（`@modelcontextprotocol/server` 2.x），仅 stdio。不带参数暴露全部 38 个工具（含下单扣费与删除），`--readonly` 只暴露 20 个只读工具，旧参数 `query`/`manage` 仍接受；18 个写操作工具执行前先向用户确认（`src/confirm.ts`），`--yes` 关闭确认；`setup` 子命令打印各客户端的配置片段，不写文件。Skills 只组织业务流程，不另写 HTTP 客户端或绕过确认。参数业务校验、鉴权、扣费都在 PHP 后端，本项目不改后端。面向其他使用者，环境要求与命令示例不以某台开发机为准。
+全球代理（quanqiudaili.com）的 Agent 工具项目，包含对外 HTTP 接口 `externalapi` 的 MCP 服务器和依赖它的业务 Skills。MCP 使用 TypeScript、官方 MCP SDK v2（`@modelcontextprotocol/server` 2.x），仅 stdio。不带参数暴露全部 38 个工具（含下单扣费与删除），`--readonly` 只暴露 20 个只读工具，旧参数 `query`/`manage` 仍接受；18 个写操作工具执行前先向用户确认（`src/confirm.ts`），`--yes` 关闭确认；`setup` 子命令打印各客户端的配置片段，不写文件。Skills 只组织业务流程，不另写 HTTP 客户端或绕过确认。参数业务校验、鉴权、扣费由独立后端负责，不在本仓库实现。公开文档使用通用环境要求、示例路径和合成数据。
 
-仓库、项目、npm 包名、CLI 与 MCP 握手服务标识统一为 `quanqiudaili-agent-tools`，地址是 `https://github.com/empty-byte/quanqiudaili-agent-tools`，不保留旧名称别名。客户端配置名和业务 Skill 名仍为 `quanqiudaili`，资源 URI 和后端 HTTP 标记不随项目名变更，不额外迁移客户端配置。Node.js 要求为 `>=20`，以 `package.json.engines` 为准。仓库更名与功能发布是两件事；本地新增功能不能在推送前宣称已能从远端安装。
+仓库、项目、npm 包名、CLI 与 MCP 握手服务标识为 `quanqiudaili-agent-tools`，地址是 `https://github.com/empty-byte/quanqiudaili-agent-tools`，不提供旧名称别名。客户端配置名和业务 Skill 名为 `quanqiudaili`；资源 URI 和后端 HTTP 标记属于接口约定，不随包名调整。Node.js 要求为 `>=20`，以 `package.json.engines` 为准。发布说明以实际发布版本和可下载产物为准，本地测试通过不代表远端版本已更新。
 
 ## 常用命令
 
@@ -17,7 +17,7 @@
 - `npm run build-skills`：把 Session 规范同步到技能内的生成副本，不联网；修改规范后执行，不能手改生成副本。
 - `npm run sync-docs`：联网重新下载文档站全部接口页到 `spec/pages/`，随后自动 build-spec 并打印与上一版的差异。
 - 运行：`node dist/src/index.js [--readonly] [--yes]`。环境变量 `QQDL_TOKEN`（必填）、`QQDL_BASE_URL`（默认线上）、`QQDL_TIMEOUT_MS`、`QQDL_CONFIRM_QUIET_MS`（确认码静默期，默认 10000，端到端测试设 0）。
-- 一体安装：`node dist/src/index.js install [--agents claude-code,cursor,codex] [--scope user|project]`，默认交互选择；`--list` 列出 11 种客户端，`--dry-run` 不写文件，`--readonly` 安装只读配置，`--replace` 显式替换冲突。API Key 从交互、`QQDL_TOKEN` 或 `--token-stdin` 读取，不支持命令行明文 token 参数。
+- 一体安装：`node dist/src/index.js install [--agents claude-code,cursor,codex] [--scope user|project]`，默认交互选择；`--list` 列出 11 种客户端，`--dry-run` 不写文件、不联网、不要求 Key，`--readonly` 安装只读配置，`--replace` 显式替换冲突。API Key 从可见交互输入、`QQDL_TOKEN` 或 `--token-stdin` 读取，不支持命令行明文 token 参数；真实安装必须先通过只读用户信息接口验证，失败不写文件。
 - 配置片段：`node dist/src/index.js setup --token xxx [--readonly] [--npx]`，打印 Claude Code、Claude Desktop、Codex、Cursor、VS Code、Zed、Windsurf 的配置，生成逻辑在 `src/setup.ts`（纯文本函数，有单测）。默认按本机路径生成 `node …/dist/src/index.js`，`--npx` 生成 `npx -y github:empty-byte/quanqiudaili-agent-tools`（从 GitHub 拉起）。
 - 发布：目前从 GitHub 分发，使用者 `npx -y github:…` 时 npm 会克隆仓库、装依赖、跑 `prepare` 构建，再按 `files` 白名单（`dist/src`、`dist/runtime`、`skills`、`spec/tools.json`、`spec/dynamic-proxy-session.md`）打包，所以使用者机器要有 `git`。运行期从 `dist/src/index.js` 往上两级找包根，本地安装与打包后的安装布局一致。
 - 调试：`npx @modelcontextprotocol/inspector -e QQDL_TOKEN=xxx -- node dist/src/index.js`。客户端不一定继承当前终端的环境；优先在客户端 MCP 配置中明确设置 `QQDL_TOKEN`，Inspector 可用 `-e` 传入。直接终端启动也可继承环境变量，不要把“不一定继承”写成“永远不继承”。
@@ -44,6 +44,8 @@
 
 安装适配位于 `src/install-config.ts`，使用固定版本 `add-mcp` 的客户端路径和转换函数；`src/install.ts` 统一预检查、合并、备份与失败回滚，`src/install-cli.ts` 负责交互。重复安装更新本安装器管理的内容，不覆盖用户修改，除非显式 `--replace`。JSONC 保留其他节点注释，TOML 保留值但重新排版并移除注释，覆盖前保存原文件。项目级同一路径、同一服务槽位的不同配置不得互相覆盖。
 
+安装凭据统一通过 `GET /externalapi/user/getUserInfo` 验证，不能使用已下线的 token 检测接口或写接口。交互输入错误可重输或取消，环境变量、标准输入验证失败时以非零退出码结束；网络异常、超时和异常响应也不能放行。验证通过后才写入安装文件，`--help`、`--list`、`--dry-run` 和 `setup` 模板不联网。安装进程指定的 `QQDL_BASE_URL`、`QQDL_TIMEOUT_MS` 同步到客户端，验证与后续运行使用相同配置；验证成功不等于客户端已加载 Skill 或连接 MCP。
+
 `scripts/build-runtime.ts` 打包自包含运行时。安装时复制到用户目录 `.quanqiudaili-agent-tools/versions/<内容摘要>/dist/src/index.js`，客户端不依赖 npx 缓存或源目录；修改 Node 安装路径后需重新安装。安装测试只用合成凭据、临时用户及项目目录，不得修改开发者真实客户端配置。当前不提供卸载与历史运行版本自动清理。
 
 入口是 `skills/quanqiudaili/SKILL.md`，一个技能组织五类工作流，只保留产品路由、MCP 依赖、共同确认和结果边界；按需读取 `references/` 下的 `products-and-purchase.md`、`accounts-and-traffic.md`、`renew-and-bandwidth.md`、`delete-and-refund.md`、`proxy-connections.md`。`references/tool-map.json` 为每个工具指定一个维护归属，当前覆盖全部 38 个工具；跨流程可以复用同一工具，不复制整套 schema。
@@ -67,9 +69,9 @@ Session 规则以 `spec/dynamic-proxy-session.md` 为单一来源；优先读取
 
 ## 规则
 
-- stdout 是 MCP 协议通道，日志只用 `console.error`。token 不进日志、不进返回给模型的错误文本。
+- MCP 运行时的 stdout 是协议通道，日志只用 `console.error`。token 不进诊断日志、不进返回给模型的错误文本。独立 `install` 交互采用可见输入，验证提示只显示首尾各 4 个字符、中间星号，短 Key 全遮罩，不打印完整 Key 或用户信息响应。
 - 写操作的确认层不能绕过：新增写工具自动带确认；测试里要直接打假后端就连 `--yes` 或在客户端声明 elicitation 并自动同意。
-- 自动化测试不打线上。新增子账号、下单、续费、退单、删除等会在后端创建或删除数据的操作，只由维护者用测试账号手动验证，Codex 不代跑；只读工具和 `sub_account_update` 改备注可以联调。
+- 自动化测试使用本地假后端。新增子账号、下单、续费、退单、删除等真实写操作，只由维护者用测试账号手动验证，自动化 Agent 不代跑；只读工具和 `sub_account_update` 改备注可按任务范围联调。
 - 注释只写后来者不查资料就能懂的"为什么"，不复述库函数行为、协议版本或 SDK 内部术语；仓库没有 eslint，不写 eslint 指令。
 
 ## 文档

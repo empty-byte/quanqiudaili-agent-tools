@@ -10,6 +10,8 @@ export interface InstallOptions {
   cwd: string;
   sourceRoot: string;
   token?: string;
+  baseUrl?: string;
+  timeoutMs?: number;
   home?: string;
   readonly?: boolean;
   dryRun?: boolean;
@@ -184,7 +186,7 @@ export function installBundle(options: InstallOptions): InstallResult {
     const original = existsSync(target.configPath) ? readFileSync(target.configPath, 'utf8') : '';
     const config = parseConfig(original, target.format);
     const previous = serverEntry(config, target.key);
-    const entry = makeServerEntry(target, runtimePath, token ?? 'DRY_RUN_TOKEN', options.readonly ?? false);
+    const entry = makeServerEntry(target, runtimePath, token ?? 'DRY_RUN_TOKEN', options.readonly ?? false, options);
     const entryText = stable(entry);
     const configId = `${target.configPath}\0${target.key}`;
     const plannedEntry = configEntries.get(configId);

@@ -3,6 +3,7 @@ import { applyEdits, modify, parse, type ParseError } from 'jsonc-parser';
 import TOML from '@iarna/toml';
 import { homedir } from 'node:os';
 import { isAbsolute, join, relative, resolve, sep } from 'node:path';
+import type { Cfg } from './http.js';
 
 export const INSTALL_AGENTS = {
   'claude-code': { user: '.claude/skills', project: '.claude/skills' },
@@ -137,12 +138,17 @@ export function mergeServer(content: string, target: InstallTarget, entry: unkno
  * @param entryPath 已安装运行时的绝对入口路径。
  * @param token 用户提供的 API Key。
  * @param readonly 是否只开放查询工具。
+ * @param apiConfig 校验时使用的后端地址与超时；省略时由 MCP 使用默认值。
  * @return unknown，客户端可识别的服务条目，不包含自动批准设置。
  */
-export function makeServerEntry(target: InstallTarget, entryPath: string, token: string, readonly: boolean): unknown {
+export function makeServerEntry(target: InstallTarget, entryPath: string, token: string, readonly: boolean, apiConfig: Partial<Pick<Cfg, 'baseUrl' | 'timeoutMs'>> = {}): unknown {
   return agents[target.agent].transformConfig('quanqiudaili', {
     command: process.execPath,
     args: [entryPath, ...(readonly ? ['--readonly'] : [])],
-    env: { QQDL_TOKEN: token },
+    env: {
+      QQDL_TOKEN: token,
+      ...(apiConfig.baseUrl === undefined ? {} : { QQDL_BASE_URL: apiConfig.baseUrl }),
+      ...(apiConfig.timeoutMs === undefined ? {} : { QQDL_TIMEOUT_MS: String(apiConfig.timeoutMs) }),
+    },
   }, { configKey: target.key, local: target.local });
 }
